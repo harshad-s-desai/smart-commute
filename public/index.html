@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Commute - Let's Commute Smarter Together</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6.4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <!-- Main Project Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* CSS Variables & Modern Reset */
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: #ffffff;
+            color: var(--text);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            border: 1.5px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-light);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+        }
+
+        .btn-outline {
+            background-color: #ffffff;
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+            background-color: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff;
+            padding: 0.95rem 1.85rem;
+            font-size: 1.05rem;
+            border-radius: 9999px;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+        }
+
+        .btn-hero-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px -5px rgba(37, 99, 235, 0.6);
+            color: #ffffff;
+        }
+
+        .btn-hero-secondary {
+            background: #ffffff;
+            color: var(--primary);
+            border: 2px solid #bfdbfe;
+            padding: 0.95rem 1.85rem;
+            font-size: 1.05rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-hero-secondary:hover {
+            background: #f8fafc;
+            border-color: var(--primary-light);
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-lg {
+            padding: 0.95rem 2rem;
+            font-size: 1.05rem;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            height: 72px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+            color: var(--primary-dark);
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo i {
+            color: var(--primary-light);
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s ease;
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-light);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-light);
+            border-radius: 2px;
+        }
+
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* User Menu when logged in */
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.35rem 0.75rem;
+            background: #f1f5f9;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .user-menu:hover {
+            background: #e2e8f0;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 115%;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 210px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .user-dropdown.show {
+            display: flex;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            transition: background 0.15s;
+        }
+
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: var(--primary-light);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.25rem 0;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(180deg, #f0f7ff 0%, #e0effe 60%, #ffffff 100%);
+            padding: 4.5rem 0 3.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            align-items: center;
+            gap: 3.5rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #dbeafe;
+            color: var(--primary-dark);
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .hero-title {
+            font-size: 3.6rem;
+            line-height: 1.12;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.35rem;
+        }
+
+        .hero-title span {
+            color: var(--primary-light);
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            line-height: 1.65;
+            color: #475569;
+            margin-bottom: 2.25rem;
+            max-width: 530px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-trust {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .trust-avatars {
+            display: flex;
+        }
+
+        .trust-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            margin-right: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* Hero Right: Creative Illustration & Floating Badges */
+        .hero-visual-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .illustration-card {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 28px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(30, 58, 138, 0.18), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .illustration-graphic {
+            width: 100%;
+            height: 270px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Floating Pill Badges from Screenshot */
+        .floating-badge {
+            position: absolute;
+            background: #ffffff;
+            padding: 0.65rem 1.15rem;
+            border-radius: 9999px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            z-index: 10;
+            white-space: nowrap;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .floating-badge i {
+            font-size: 1rem;
+        }
+
+        .badge-share {
+            top: 5%;
+            left: -8%;
+            animation-delay: 0s;
+        }
+        .badge-share i { color: #3b82f6; }
+
+        .badge-save {
+            top: 2%;
+            right: 12%;
+            animation-delay: 1.5s;
+        }
+        .badge-save i { color: #f59e0b; }
+
+        .badge-traffic {
+            bottom: 22%;
+            left: -10%;
+            animation-delay: 0.8s;
+        }
+        .badge-traffic i { color: #2563eb; }
+
+        .badge-eco {
+            bottom: 8%;
+            right: -6%;
+            animation-delay: 2.2s;
+        }
+        .badge-eco i { color: #10b981; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* 4 Features Cards Bar under Hero */
+        .features-bar-section {
+            margin-top: -2rem;
+            position: relative;
+            z-index: 20;
+            padding-bottom: 4.5rem;
+        }
+
+        .features-bar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .feature-chip-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 1.35rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
+        }
+
+        .feature-chip-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -5px rgba(30, 58, 138, 0.12);
+            border-color: #cbd5e1;
+        }
+
+        .feature-chip-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-chip-icon.green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .feature-chip-icon.blue {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .feature-chip-icon.cyan {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .feature-chip-info h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+        }
+
+        .feature-chip-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        /* Quick Search Card Section */
+        .quick-search-section {
+            background: var(--bg);
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-container-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border);
+        }
+
+        .search-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-title-row h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .search-form-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1fr 1fr;
+            gap: 1.25rem;
+            align-items: flex-end;
+        }
+
+        .search-input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.4rem;
+        }
+
+        .search-select,
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: #f8fafc;
+        }
+
+        .search-select:focus,
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: #ffffff;
+        }
+
+        /* How It Works Section */
+        .how-section {
+            padding: 5.5rem 0;
+            background: #ffffff;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 3.5rem auto;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--primary-light);
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 2.35rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            position: relative;
+        }
+
+        .how-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        .how-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -10px rgba(30, 58, 138, 0.12);
+            border-color: #cbd5e1;
+        }
+
+        .step-number {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #e2e8f0;
+        }
+
+        .how-icon-box {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.85rem;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.15);
+        }
+
+        .how-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+        }
+
+        .how-card p {
+            font-size: 0.925rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Stats & Impact Section */
+        .stats-section {
+            background: linear-gradient(145deg, #1e3a8a 0%, #1e40af 100%);
+            padding: 5rem 0;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 2.25rem 1.5rem;
+            transition: transform 0.25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #93c5fd;
+        }
+
+        .stat-value {
+            font-size: 2.75rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #bfdbfe;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 5.5rem 0;
+            background: var(--bg);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: #cbd5e1;
+        }
+
+        .testimonial-rating {
+            color: #f59e0b;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .testimonial-text {
+            font-size: 0.975rem;
+            line-height: 1.65;
+            color: #334155;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-user {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+        }
+
+        .testimonial-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .testimonial-user h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.15rem;
+        }
+
+        .testimonial-user p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Bottom CTA Section */
+        .cta-section {
+            padding: 5rem 0;
+            background: #ffffff;
+        }
+
+        .cta-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            border-radius: 28px;
+            padding: 4.5rem 3.5rem;
+            text-align: center;
+            color: #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(30, 58, 138, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner h2 {
+            font-size: 2.85rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 1rem;
+        }
+
+        .cta-banner p {
+            font-size: 1.15rem;
+            color: #bfdbfe;
+            max-width: 620px;
+            margin: 0 auto 2.5rem auto;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+        }
+
+        .btn-white {
+            background: #ffffff;
+            color: var(--primary);
+            font-weight: 700;
+            padding: 0.95rem 2rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-white:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            color: var(--primary-dark);
+        }
+
+        .btn-trans {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            padding: 0.95rem 2rem;
+            border-radius: 9999px;
+            backdrop-filter: blur(6px);
+        }
+
+        .btn-trans:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 4.5rem 0 2rem 0;
+            border-top: 1px solid #1e293b;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.2fr;
+            gap: 3rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .footer-brand h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand h3 i {
+            color: var(--primary-light);
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            max-width: 320px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.85rem;
+        }
+
+        .social-link {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #1e293b;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .social-link:hover {
+            background: var(--primary-light);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .footer-col h4 {
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #1e293b;
+            padding-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+            .hero-visual-wrapper {
+                order: -1;
+            }
+            .hero-title {
+                font-size: 3rem;
+            }
+            .features-bar-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .mobile-toggle {
+                display: block;
+            }
+            .hero-title {
+                font-size: 2.4rem;
+            }
+            .hero-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-form-row {
+                grid-template-columns: 1fr;
+            }
+            .how-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            .features-bar-grid {
+                grid-template-columns: 1fr;
+            }
+            .cta-banner {
+                padding: 3rem 1.5rem;
+            }
+            .cta-banner h2 {
+                font-size: 2rem;
+            }
+            .cta-buttons {
+                flex-direction: column;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Common Navbar -->
+    <header>
+        <nav class="navbar" id="mainNavbar">
+            <div class="nav-container">
+                <a href="/" class="nav-logo">
+                    <i class="fas fa-route"></i>
+                    <span>Smart Commute</span>
+                </a>
+
+                <div class="nav-links" id="navLinks">
+                    <a href="/" class="nav-link active">Home</a>
+                    <a href="/find-ride.html" class="nav-link">Find Ride</a>
+                    <a href="/offer-ride.html" class="nav-link">Offer Ride</a>
+                    <a href="#how-it-works" class="nav-link">How It Works</a>
+                    <a href="#about" class="nav-link">About</a>
+                </div>
+
+                <div class="nav-auth" id="navAuth">
+                    <!-- Default guest view -->
+                    <a href="/login.html" class="btn btn-outline" id="navLoginBtn">Login</a>
+                    <a href="/login.html#signup" class="btn btn-primary" id="navSignupBtn">Sign Up</a>
+                </div>
+
+                <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-grid">
+                    <!-- Left Hero Content -->
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <i class="fas fa-sparkles"></i>
+                            <span>Kolhapur's Community Commute Network</span>
+                        </div>
+                        <h1 class="hero-title">
+                            Let's Commute<br>
+                            <span>Smarter Together</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Share rides, save money, reduce traffic and make travel a better experience for everyone across Kolhapur.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="/find-ride.html" class="btn btn-hero-primary">
+                                <span>Find a Ride</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <a href="/offer-ride.html" class="btn btn-hero-secondary">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Offer a Ride</span>
+                            </a>
+                        </div>
+                        <div class="hero-trust">
+                            <div class="trust-avatars">
+                                <div class="trust-avatar" style="background:#2563eb;">K</div>
+                                <div class="trust-avatar" style="background:#10b981;">D</div>
+                                <div class="trust-avatar" style="background:#f59e0b;">S</div>
+                                <div class="trust-avatar" style="background:#8b5cf6;">R</div>
+                            </div>
+                            <span>Trusted by 15,000+ daily commuters from KIT, DY Patil & Shivaji University</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Graphic with Floating Badges -->
+                    <div class="hero-visual-wrapper">
+                        <!-- Floating Badges from Reference Screenshot -->
+                        <div class="floating-badge badge-share">
+                            <i class="fas fa-users"></i>
+                            <span>Share Rides</span>
+                        </div>
+
+                        <div class="floating-badge badge-save">
+                            <i class="fas fa-coins"></i>
+                            <span>Save Money</span>
+                        </div>
+
+                        <div class="floating-badge badge-traffic">
+                            <i class="fas fa-car-side"></i>
+                            <span>Less Traffic</span>
+                        </div>
+
+                        <div class="floating-badge badge-eco">
+                            <i class="fas fa-leaf"></i>
+                            <span>Cleaner Environment</span>
+                        </div>
+
+                        <!-- Card Illustration -->
+                        <div class="illustration-card">
+                            <div class="illustration-graphic">
+                                <svg viewBox="0 0 420 250" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+                                    <!-- Sky Background -->
+                                    <rect width="420" height="250" rx="16" fill="#EFF6FF"/>
+                                    <!-- Rolling Hills -->
+                                    <path d="M0 190 Q 90 150 200 180 T 420 170 L 420 250 L 0 250 Z" fill="#DBEAFE"/>
+                                    <path d="M0 210 Q 140 180 260 210 T 420 205 L 420 250 L 0 250 Z" fill="#BFDBFE"/>
+                                    <!-- Cityscape outlines in distance -->
+                                    <rect x="50" y="130" width="22" height="60" rx="3" fill="#93C5FD" opacity="0.6"/>
+                                    <rect x="76" y="110" width="26" height="80" rx="3" fill="#60A5FA" opacity="0.5"/>
+                                    <rect x="106" y="135" width="20" height="55" rx="3" fill="#93C5FD" opacity="0.6"/>
+                                    <rect x="320" y="120" width="24" height="70" rx="3" fill="#60A5FA" opacity="0.5"/>
+                                    <rect x="348" y="138" width="28" height="52" rx="3" fill="#93C5FD" opacity="0.6"/>
+                                    <!-- Road -->
+                                    <path d="M-10 245 L 430 245 L 390 205 L 30 205 Z" fill="#334155"/>
+                                    <line x1="60" y1="225" x2="110" y2="225" stroke="#FDE047" stroke-width="4" stroke-dasharray="12 12"/>
+                                    <line x1="160" y1="225" x2="220" y2="225" stroke="#FDE047" stroke-width="4" stroke-dasharray="12 12"/>
+                                    <line x1="270" y1="225" x2="340" y2="225" stroke="#FDE047" stroke-width="4" stroke-dasharray="12 12"/>
+                                    <!-- Sleek Modern Car -->
+                                    <g transform="translate(110, 140)">
+                                        <!-- Car Body -->
+                                        <path d="M25 45 C40 45 55 20 85 15 C130 8 160 8 195 20 C215 28 225 45 235 50 C242 53 245 60 242 66 C238 72 230 75 220 75 L15 75 C8 75 2 70 2 64 C2 54 10 46 25 45 Z" fill="#2563EB"/>
+                                        <!-- Car Roof & Windows -->
+                                        <path d="M75 18 L185 18 C195 18 205 32 210 42 L55 42 C62 30 68 18 75 18 Z" fill="#1E293B"/>
+                                        <path d="M80 22 L125 22 L125 40 L65 40 Z" fill="#93C5FD" opacity="0.9"/>
+                                        <path d="M133 22 L180 22 C188 22 195 32 200 40 L133 40 Z" fill="#93C5FD" opacity="0.9"/>
+                                        <!-- Happy Commuter Passengers in Window -->
+                                        <circle cx="100" cy="30" r="6" fill="#FED7AA"/>
+                                        <circle cx="155" cy="30" r="6" fill="#FBCFE8"/>
+                                        <!-- Headlight & Taillight -->
+                                        <path d="M235 52 L244 55 C244 60 240 64 235 64 Z" fill="#FEF08A"/>
+                                        <path d="M4 52 L12 52 L10 62 L3 60 Z" fill="#EF4444"/>
+                                        <!-- Wheels -->
+                                        <g transform="translate(50, 60)">
+                                            <circle cx="15" cy="15" r="16" fill="#0F172A"/>
+                                            <circle cx="15" cy="15" r="9" fill="#94A3B8"/>
+                                            <circle cx="15" cy="15" r="4" fill="#0F172A"/>
+                                        </g>
+                                        <g transform="translate(170, 60)">
+                                            <circle cx="15" cy="15" r="16" fill="#0F172A"/>
+                                            <circle cx="15" cy="15" r="9" fill="#94A3B8"/>
+                                            <circle cx="15" cy="15" r="4" fill="#0F172A"/>
+                                        </g>
+                                    </g>
+                                    <!-- Cheerful Trees on roadside -->
+                                    <circle cx="45" cy="180" r="16" fill="#10B981"/>
+                                    <rect x="42" y="195" width="6" height="15" fill="#78350F"/>
+                                    <circle cx="380" cy="175" r="18" fill="#059669"/>
+                                    <rect x="377" y="192" width="6" height="18" fill="#78350F"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 Key Feature Cards Bar (Directly below Hero) -->
+        <section class="features-bar-section">
+            <div class="container">
+                <div class="features-bar-grid">
+                    <!-- Feature 1 -->
+                    <div class="feature-chip-card">
+                        <div class="feature-chip-icon green">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div class="feature-chip-info">
+                            <h4>Safe & Verified Users</h4>
+                            <p>Travel with trust & peace of mind</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-chip-card">
+                        <div class="feature-chip-icon blue">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </div>
+                        <div class="feature-chip-info">
+                            <h4>Affordable Travel</h4>
+                            <p>Share vehicle costs and save</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-chip-card">
+                        <div class="feature-chip-icon cyan">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="feature-chip-info">
+                            <h4>Flexible Options</h4>
+                            <p>Choose as per your schedule</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="feature-chip-card">
+                        <div class="feature-chip-icon green">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="feature-chip-info">
+                            <h4>Greener Tomorrow</h4>
+                            <p>Reduce carbon emissions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Quick Commute Search Section -->
+        <section class="quick-search-section">
+            <div class="container">
+                <div class="search-container-box">
+                    <div class="search-title-row">
+                        <div>
+                            <h3>Where are you heading today?</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Quickly find fellow commuters along your route in Kolhapur</p>
+                        </div>
+                        <a href="/find-ride.html" class="btn btn-outline" style="font-size: 0.85rem;">
+                            <span>Advanced Search</span>
+                            <i class="fas fa-sliders"></i>
+                        </a>
+                    </div>
+                    <form id="heroQuickSearchForm" action="/find-ride.html" method="GET">
+                        <div class="search-form-row">
+                            <div class="search-input-group">
+                                <label for="quickOrigin"><i class="fas fa-circle-dot" style="color: #3b82f6; margin-right: 4px;"></i> Leaving From</label>
+                                <select id="quickOrigin" name="origin" class="search-select">
+                                    <option value="">Select pickup station...</option>
+                                    <option value="KIT College of Engineering">KIT College of Engineering</option>
+                                    <option value="DY Patil College">DY Patil College</option>
+                                    <option value="Shivaji University">Shivaji University</option>
+                                    <option value="Rajaram College">Rajaram College</option>
+                                    <option value="CBS (Central Bus Stand)">CBS (Central Bus Stand)</option>
+                                    <option value="Kolhapur Railway Station">Kolhapur Railway Station</option>
+                                    <option value="Rajarampuri">Rajarampuri</option>
+                                    <option value="Rankala Lake">Rankala Lake</option>
+                                    <option value="Tarabai Park">Tarabai Park</option>
+                                    <option value="RK Nagar">RK Nagar</option>
+                                </select>
+                            </div>
+
+                            <div class="search-input-group">
+                                <label for="quickDest"><i class="fas fa-location-dot" style="color: #ef4444; margin-right: 4px;"></i> Going To</label>
+                                <select id="quickDest" name="destination" class="search-select">
+                                    <option value="">Select dropoff station...</option>
+                                    <option value="Shivaji University">Shivaji University</option>
+                                    <option value="KIT College of Engineering">KIT College of Engineering</option>
+                                    <option value="DY Patil College">DY Patil College</option>
+                                    <option value="CBS (Central Bus Stand)">CBS (Central Bus Stand)</option>
+                                    <option value="Shiroli MIDC">Shiroli MIDC</option>
+                                    <option value="Mahalaxmi Temple">Mahalaxmi Temple</option>
+                                    <option value="Rankala Lake">Rankala Lake</option>
+                                    <option value="Kolhapur Airport">Kolhapur Airport</option>
+                                </select>
+                            </div>
+
+                            <div class="search-input-group">
+                                <label for="quickDate"><i class="fas fa-calendar" style="color: var(--primary-light); margin-right: 4px;"></i> Date</label>
+                                <input type="date" id="quickDate" name="date" class="search-input">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg" style="height: 48px; border-radius: 10px;">
+                                <i class="fas fa-magnifying-glass"></i>
+                                <span>Find Rides</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-section" id="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Simple Process</span>
+                    <h2 class="section-title">How Smart Commute Works</h2>
+                    <p class="section-subtitle">Experience smooth carpooling in 3 easy steps. Whether you want a ride or have empty seats to share.</p>
+                </div>
+
+                <div class="how-grid">
+                    <!-- Step 1 -->
+                    <div class="how-card">
+                        <span class="step-number">01</span>
+                        <div class="how-icon-box">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h3>Sign Up & Verify</h3>
+                        <p>Create your verified profile in seconds using your mobile number and college or office details for complete safety and trust.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="how-card">
+                        <span class="step-number">02</span>
+                        <div class="how-icon-box">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3>Find or Offer Rides</h3>
+                        <p>Search active rides heading your way or post your own route with flexible timings, seat count, vehicle type, and fair cost-sharing.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="how-card">
+                        <span class="step-number">03</span>
+                        <div class="how-icon-box">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>Travel Together</h3>
+                        <p>Coordinate smoothly, meet at your designated Kolhapur landmark, travel comfortably, and split fuel expenses effortlessly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats / Impact Section -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="section-header" style="color: #ffffff; margin-bottom: 3.5rem;">
+                    <span class="section-tag" style="background: rgba(255,255,255,0.2); color: #ffffff;">Our Impact</span>
+                    <h2 class="section-title" style="color: #ffffff;">Making Kolhapur Greener & Connected</h2>
+                    <p class="section-subtitle" style="color: #bfdbfe;">Every shared ride removes single-occupancy vehicles from city streets, cutting emissions and traffic.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-value" data-target="15000">15,000+</div>
+                        <div class="stat-label">Happy Commuters</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-car"></i></div>
+                        <div class="stat-value" data-target="45000">45,000+</div>
+                        <div class="stat-label">Rides Shared</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-indian-rupee-sign"></i></div>
+                        <div class="stat-value" data-target="1850000">₹18.5L+</div>
+                        <div class="stat-label">Money Saved by Users</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-leaf"></i></div>
+                        <div class="stat-value" data-target="92000">92,000 kg</div>
+                        <div class="stat-label">CO₂ Emissions Saved</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials-section" id="about">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Community Voices</span>
+                    <h2 class="section-title">Loved by Kolhapur Commuters</h2>
+                    <p class="section-subtitle">Real experiences from students, professors, and professionals traveling smarter every day.</p>
+                </div>
+
+                <div class="testimonials-grid">
+                    <!-- Quote 1 -->
+                    <div class="testimonial-card">
+                        <div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-text">
+                                "Smart Commute completely revolutionized my travel from Rajarampuri to KIT College. I split petrol costs with friendly batchmates and avoid crowded public buses!"
+                            </p>
+                        </div>
+                        <div class="testimonial-user">
+                            <div class="testimonial-avatar" style="background: #dbeafe; color: #1d4ed8;">R</div>
+                            <div>
+                                <h4>Rahul Sharma</h4>
+                                <p>Student, KIT College of Engg</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quote 2 -->
+                    <div class="testimonial-card">
+                        <div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-text">
+                                "As a female professional commuting to DY Patil campus, the verified driver badges and women-only carpool filter give me unmatched safety and confidence."
+                            </p>
+                        </div>
+                        <div class="testimonial-user">
+                            <div class="testimonial-avatar" style="background: #fce7f3; color: #be185d;">S</div>
+                            <div>
+                                <h4>Sneha Patil</h4>
+                                <p>IT Professional, DY Patil Campus</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quote 3 -->
+                    <div class="testimonial-card">
+                        <div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p class="testimonial-text">
+                                "I offer rides on my daily commute from Tarabai Park to Shivaji University. I save around ₹3,500 every month and feel good about reducing Kolhapur's traffic."
+                            </p>
+                        </div>
+                        <div class="testimonial-user">
+                            <div class="testimonial-avatar" style="background: #dcfce7; color: #15803d;">A</div>
+                            <div>
+                                <h4>Prof. Amit Verma</h4>
+                                <p>Faculty, Shivaji University</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Call to Action Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-banner">
+                    <h2>Ready to commute smarter?</h2>
+                    <p>Join thousands of daily commuters in Kolhapur making travel affordable, convenient, and eco-friendly. Register your account in just 60 seconds.</p>
+                    <div class="cta-buttons">
+                        <a href="/login.html#signup" class="btn btn-white btn-lg">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Create Free Account</span>
+                        </a>
+                        <a href="/find-ride.html" class="btn btn-trans btn-lg">
+                            <i class="fas fa-magnifying-glass"></i>
+                            <span>Explore Active Rides</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Col 1: Brand -->
+                <div class="footer-brand">
+                    <h3>
+                        <i class="fas fa-route"></i>
+                        <span>Smart Commute</span>
+                    </h3>
+                    <p>
+                        Kolhapur's premier community ridesharing and transit platform designed for students, workers, and everyday commuters.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links -->
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/find-ride.html">Find a Ride</a></li>
+                        <li><a href="/offer-ride.html">Offer a Ride</a></li>
+                        <li><a href="/dashboard.html">My Dashboard</a></li>
+                        <li><a href="/admin.html">Admin Portal</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Popular Hubs -->
+                <div class="footer-col">
+                    <h4>Popular Hubs</h4>
+                    <ul class="footer-links">
+                        <li><a href="/find-ride.html?station=KIT">KIT College</a></li>
+                        <li><a href="/find-ride.html?station=DYPatil">DY Patil Campus</a></li>
+                        <li><a href="/find-ride.html?station=SUK">Shivaji University</a></li>
+                        <li><a href="/find-ride.html?station=CBS">Central Bus Stand (CBS)</a></li>
+                        <li><a href="/find-ride.html?station=Station">Kolhapur Railway</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Safety & Support -->
+                <div class="footer-col">
+                    <h4>Safety & Trust</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="alert('Smart Commute verifies phone numbers, email addresses, and vehicle details to maintain a trusted community.'); return false;">Safety Guidelines</a></li>
+                        <li><a href="#" onclick="alert('Community rules: Be punctual, respectful, keep vehicles clean, and honor confirmed bookings.'); return false;">Community Guidelines</a></li>
+                        <li><a href="#" onclick="alert('Contact support at support@smartcommute.kolhapur.in'); return false;">Help & Support</a></li>
+                        <li><a href="/login.html">Member Login</a></li>
+                        <li><a href="/admin.html" style="color: #60a5fa; font-weight: 600;"><i class="fas fa-shield-halved" style="margin-right: 4px;"></i> Admin Control Center</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>&copy; 2026 Smart Commute Kolhapur. All rights reserved.</div>
+                <div style="display: flex; gap: 1.5rem;">
+                    <span style="color: #64748b;">Powered by Kolhapur Smart Mobility</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/auth.js"></script>
+
+    <!-- Inline script for navbar auth state and animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check auth state for navbar display
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            const navAuth = document.getElementById('navAuth');
+
+            if (token && userStr && navAuth) {
+                try {
+                    const user = JSON.parse(userStr);
+                    const initial = (user.name || 'U').charAt(0).toUpperCase();
+
+                    navAuth.innerHTML = `
+                        <div class="user-menu" id="userMenuDropdownTrigger">
+                            <span class="user-avatar">${initial}</span>
+                            <span class="user-name">${user.name.split(' ')[0]}</span>
+                            <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: #64748b;"></i>
+                            <div class="user-dropdown" id="navUserDropdown">
+                                <a href="/dashboard.html" class="dropdown-item">
+                                    <i class="fas fa-gauge-high"></i> Dashboard
+                                </a>
+                                <a href="/find-ride.html" class="dropdown-item">
+                                    <i class="fas fa-magnifying-glass"></i> Find Ride
+                                </a>
+                                <a href="/offer-ride.html" class="dropdown-item">
+                                    <i class="fas fa-plus"></i> Offer Ride
+                                </a>
+                                ${user.is_admin ? `
+                                <a href="/admin.html" class="dropdown-item" style="color: #2563eb;">
+                                    <i class="fas fa-shield-halved"></i> Admin Portal
+                                </a>` : ''}
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item" id="navLogoutAction" style="color: #ef4444;">
+                                    <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    `;
+
+                    const trigger = document.getElementById('userMenuDropdownTrigger');
+                    const dropdown = document.getElementById('navUserDropdown');
+                    const logoutAction = document.getElementById('navLogoutAction');
+
+                    if (trigger && dropdown) {
+                        trigger.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            dropdown.classList.toggle('show');
+                        });
+
+                        document.addEventListener('click', () => {
+                            dropdown.classList.remove('show');
+                        });
+                    }
+
+                    if (logoutAction) {
+                        logoutAction.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (window.AuthHelper?.logout) {
+                                window.AuthHelper.logout();
+                            } else {
+                                localStorage.removeItem('token');
+                                localStorage.removeItem('user');
+                                window.location.href = '/login.html';
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to parse user session:', e);
+                }
+            }
+
+            // Set default date for quick search to today
+            const dateInput = document.getElementById('quickDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+                dateInput.min = today;
+            }
+
+            // Mobile menu toggle
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+            if (mobileBtn && navLinks) {
+                mobileBtn.addEventListener('click', () => {
+                    if (navLinks.style.display === 'flex') {
+                        navLinks.style.display = 'none';
+                    } else {
+                        navLinks.style.display = 'flex';
+                        navLinks.style.flexDirection = 'column';
+                        navLinks.style.position = 'absolute';
+                        navLinks.style.top = '72px';
+                        navLinks.style.left = '0';
+                        navLinks.style.right = '0';
+                        navLinks.style.background = '#ffffff';
+                        navLinks.style.padding = '1.5rem';
+                        navLinks.style.boxShadow = '0 10px 15px rgba(0,0,0,0.1)';
+                    }
+                });
+            }
+
+            // Animated Stats Counter
+            const statElements = document.querySelectorAll('.stat-value');
+            if ('IntersectionObserver' in window) {
+                const statsObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const el = entry.target;
+                            const target = parseInt(el.getAttribute('data-target') || '0', 10);
+                            if (target > 0) {
+                                animateCounter(el, target);
+                            }
+                            observer.unobserve(el);
+                        }
+                    });
+                }, { threshold: 0.3 });
+
+                statElements.forEach(el => statsObserver.observe(el));
+            }
+
+            function animateCounter(el, target) {
+                const duration = 1800;
+                const steps = 60;
+                const stepValue = target / steps;
+                let current = 0;
+                const interval = setInterval(() => {
+                    current += stepValue;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(interval);
+                    }
+                    if (target >= 1000000) {
+                        el.textContent = '₹' + (current / 100000).toFixed(1) + 'L+';
+                    } else if (target === 92000) {
+                        el.textContent = Math.floor(current).toLocaleString('en-IN') + ' kg';
+                    } else {
+                        el.textContent = Math.floor(current).toLocaleString('en-IN') + '+';
+                    }
+                }, duration / steps);
+            }
+        });
+    </script>
+</body>
+</html>

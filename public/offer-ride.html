@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer a Ride - Smart Commute</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6.4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Project Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s ease;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        .btn-outline {
+            border-color: var(--border);
+            color: var(--text);
+            background: transparent;
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: #f8fafc;
+        }
+        .btn-lg {
+            padding: 0.85rem 1.75rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+            color: #ffffff;
+            border: none;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.35);
+            transform: translateY(-1px);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            cursor: pointer;
+        }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Two-Column Offer Ride Layout */
+        .offer-ride-container {
+            max-width: 1300px;
+            margin: 1.5rem auto 3rem auto;
+            padding: 0 1.5rem;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .page-header-intro {
+            margin-bottom: 1.5rem;
+        }
+        .page-header-intro h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+            margin: 0 0 0.35rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .page-header-intro p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .offer-grid-layout {
+            display: grid;
+            grid-template-columns: minmax(460px, 1.25fr) minmax(420px, 1fr);
+            gap: 1.75rem;
+            align-items: start;
+        }
+
+        /* Card container */
+        .card {
+            background: var(--card);
+            border-radius: 0.85rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-header h2, .card-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.45rem;
+        }
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-with-icon i.input-icon {
+            position: absolute;
+            left: 0.95rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.6rem;
+            border: 1px solid var(--border);
+            border-radius: 0.55rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: #ffffff;
+            transition: all 0.15s ease;
+            box-sizing: border-box;
+        }
+        .form-input.no-icon, .form-select.no-icon {
+            padding-left: 1rem;
+        }
+        .form-textarea {
+            padding-left: 1rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Vehicle Type Toggle Buttons */
+        .vehicle-toggle-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+        .vehicle-toggle-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.85rem 0.5rem;
+            border: 1.5px solid var(--border);
+            border-radius: 0.6rem;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-muted);
+            user-select: none;
+        }
+        .vehicle-toggle-btn i {
+            font-size: 1.4rem;
+        }
+        .vehicle-toggle-btn span {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .vehicle-toggle-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            background: #f8fafc;
+        }
+        .vehicle-toggle-btn.active {
+            border-color: var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        /* Seat Stepper Control */
+        .stepper-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .stepper-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 0.5rem;
+            border: 1.5px solid var(--border);
+            background: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .stepper-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #eff6ff;
+        }
+        .stepper-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .stepper-value {
+            width: 70px;
+            height: 42px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            border: 1.5px solid var(--border);
+            border-radius: 0.5rem;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stepper-hint {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+        }
+
+        /* Suggested Fare Hint */
+        .fare-hint-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.45rem;
+            font-size: 0.825rem;
+        }
+        .fare-suggestion-badge {
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .fare-suggestion-badge:hover {
+            background: #dbeafe;
+        }
+
+        /* Autocomplete dropdown */
+        .autocomplete-wrapper {
+            position: relative;
+        }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            z-index: 1050;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
+        .autocomplete-header {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: #f8fafc;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .autocomplete-item {
+            padding: 0.6rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.12s ease;
+        }
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background-color: #f0f7ff;
+        }
+        .autocomplete-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .autocomplete-item-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .autocomplete-item-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .autocomplete-item-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .autocomplete-loading, .autocomplete-empty {
+            padding: 0.85rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Right Column: Route Preview Map & Guidelines */
+        .offer-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .map-card {
+            background: #ffffff;
+            border-radius: 0.85rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .map-header {
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .map-header h3 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .route-metrics-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.825rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: #eff6ff;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+        }
+        .offer-map-container {
+            width: 100%;
+            height: 340px;
+            background: #e2e8f0;
+        }
+
+        /* Safety Guidelines Card (Blue background) */
+        .safety-card {
+            background: linear-gradient(145deg, #eff6ff 0%, #f0fdf4 100%);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 0.85rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.05);
+        }
+        .safety-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 1.1rem;
+        }
+        .safety-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #1e40af;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(30, 64, 175, 0.25);
+        }
+        .safety-header h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+        .safety-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .safety-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.45;
+        }
+        .safety-item-icon {
+            color: #10b981;
+            font-size: 0.95rem;
+            margin-top: 0.15rem;
+            flex-shrink: 0;
+        }
+        .safety-item strong {
+            color: #0f172a;
+        }
+
+        /* Custom Map Pin Styles */
+        .custom-map-pin-wrapper {
+            position: relative;
+        }
+        .custom-map-pin {
+            width: 32px;
+            height: 32px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            border: 2px solid #ffffff;
+            color: #ffffff;
+        }
+        .custom-map-pin i {
+            transform: rotate(45deg);
+            font-size: 14px;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            background: #ffffff;
+            border-radius: 0.5rem;
+            padding: 0.85rem 1.2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            min-width: 280px;
+            max-width: 420px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.25s ease;
+            border-left: 4px solid var(--primary);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success { border-left-color: var(--success); }
+        .toast-error { border-left-color: var(--danger); }
+        .toast-warning { border-left-color: var(--warning); }
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .offer-grid-layout {
+                grid-template-columns: 1fr;
+            }
+            .offer-map-container {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .vehicle-toggle-group {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Common Application Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <i class="fas fa-route"></i> Smart Commute
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/find-ride.html">Find Ride</a>
+                <a href="/offer-ride.html" class="active">Offer Ride</a>
+                <a href="/dashboard.html">My Rides</a>
+            </div>
+            <div class="nav-auth" id="navAuth">
+                <a href="/login.html" class="btn btn-outline">Login</a>
+                <a href="/login.html#signup" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="offer-ride-container">
+
+        <div class="page-header-intro">
+            <h1><i class="fas fa-car-tunnel text-primary"></i> Offer a Commute Ride</h1>
+            <p>Share your journey and help others commute across Kolhapur while splitting travel expenses.</p>
+        </div>
+
+        <div class="offer-grid-layout">
+
+            <!-- ============================================== -->
+            <!-- LEFT COLUMN: Offer Ride Form                   -->
+            <!-- ============================================== -->
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-route text-primary"></i> Ride Details</h2>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Step 1 of 1</span>
+                </div>
+                <div class="card-body">
+                    <form id="offerRideForm" autocomplete="off">
+
+                        <!-- From Input -->
+                        <div class="form-group autocomplete-wrapper">
+                            <label class="form-label" for="offerFromInput">From (Pickup Location) <span style="color: var(--danger);">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-circle-dot input-icon" style="color: #10b981;"></i>
+                                <input type="text" id="offerFromInput" class="form-input" placeholder="e.g. Shivaji University, Rajarampuri..." required>
+                            </div>
+                            <input type="hidden" id="originLat" name="origin_lat">
+                            <input type="hidden" id="originLng" name="origin_lng">
+                            <input type="hidden" id="originName" name="origin_name">
+                        </div>
+
+                        <!-- To Input -->
+                        <div class="form-group autocomplete-wrapper">
+                            <label class="form-label" for="offerToInput">To (Destination Location) <span style="color: var(--danger);">*</span></label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-location-dot input-icon" style="color: #ef4444;"></i>
+                                <input type="text" id="offerToInput" class="form-input" placeholder="e.g. KIT College of Engineering, RK Nagar..." required>
+                            </div>
+                            <input type="hidden" id="destLat" name="dest_lat">
+                            <input type="hidden" id="destLng" name="dest_lng">
+                            <input type="hidden" id="destName" name="dest_name">
+                        </div>
+
+                        <!-- Date and Time Row -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="offerDateInput">Date <span style="color: var(--danger);">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar-alt input-icon"></i>
+                                    <input type="date" id="offerDateInput" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="offerTimeInput">Departure Time <span style="color: var(--danger);">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="far fa-clock input-icon"></i>
+                                    <input type="time" id="offerTimeInput" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Type Toggle Buttons -->
+                        <div class="form-group">
+                            <label class="form-label">Vehicle Type <span style="color: var(--danger);">*</span></label>
+                            <div class="vehicle-toggle-group" id="vehicleToggleGroup">
+                                <div class="vehicle-toggle-btn active" data-type="car">
+                                    <i class="fas fa-car"></i>
+                                    <span>Car</span>
+                                </div>
+                                <div class="vehicle-toggle-btn" data-type="bike">
+                                    <i class="fas fa-motorcycle"></i>
+                                    <span>Bike</span>
+                                </div>
+                                <div class="vehicle-toggle-btn" data-type="auto">
+                                    <i class="fas fa-car-side"></i>
+                                    <span>Auto</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="vehicleTypeInput" name="vehicle_type" value="car">
+                        </div>
+
+                        <!-- Seats Stepper Row & Fare Input Row -->
+                        <div class="form-row">
+                            <!-- Available Seats -->
+                            <div class="form-group">
+                                <label class="form-label">Available Seats <span style="color: var(--danger);">*</span></label>
+                                <div class="stepper-container">
+                                    <button type="button" id="seatMinusBtn" class="stepper-btn" aria-label="Decrease Seats">-</button>
+                                    <div class="stepper-value" id="seatValueDisplay">3</div>
+                                    <button type="button" id="seatPlusBtn" class="stepper-btn" aria-label="Increase Seats">+</button>
+                                    <input type="hidden" id="seatsInput" name="available_seats" value="3">
+                                </div>
+                                <span class="stepper-hint" id="seatMaxHint">Max 6 seats for Car</span>
+                            </div>
+
+                            <!-- Expected Fare -->
+                            <div class="form-group">
+                                <label class="form-label" for="farePerSeatInput">Fare per Seat (₹) <span style="color: var(--danger);">*</span></label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-indian-rupee-sign input-icon"></i>
+                                    <input type="number" id="farePerSeatInput" class="form-input" min="0" max="1000" placeholder="e.g. 40" required>
+                                </div>
+                                <div class="fare-hint-box">
+                                    <span style="color: var(--text-muted);" id="fareCalculationHint">Suggested: ₹5/km</span>
+                                    <span class="fare-suggestion-badge" id="applySuggestedFareBtn" style="display: none;">Apply Suggested</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gender Preference -->
+                        <div class="form-group">
+                            <label class="form-label" for="genderPreferenceSelect">Gender Preference</label>
+                            <select id="genderPreferenceSelect" class="form-select no-icon" name="gender_preference">
+                                <option value="any">Any Commuters Welcome</option>
+                                <option value="male">Male Commuters Only</option>
+                                <option value="female">Female Commuters Only</option>
+                            </select>
+                        </div>
+
+                        <!-- Additional Notes -->
+                        <div class="form-group">
+                            <label class="form-label" for="offerNotesInput">Additional Notes (Optional)</label>
+                            <textarea id="offerNotesInput" class="form-textarea" placeholder="e.g. Non-smoking ride, AC on, luggage space available, leaving promptly on time."></textarea>
+                        </div>
+
+                        <!-- Post Ride Button -->
+                        <button type="submit" id="postRideSubmitBtn" class="btn btn-gradient btn-lg" style="width: 100%; margin-top: 0.5rem;">
+                            <i class="fas fa-paper-plane"></i> Post Commute Ride
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ============================================== -->
+            <!-- RIGHT COLUMN: Map Preview & Safety Guidelines  -->
+            <!-- ============================================== -->
+            <aside class="offer-sidebar">
+
+                <!-- Leaflet Route Preview Card -->
+                <div class="map-card">
+                    <div class="map-header">
+                        <h3><i class="fas fa-map-location-dot text-primary"></i> Route Preview</h3>
+                        <div class="route-metrics-badge" id="routeMetricsBox">
+                            <span><i class="fas fa-road"></i> <span id="routeDistance">-- km</span></span>
+                            <span>&bull;</span>
+                            <span><i class="far fa-clock"></i> <span id="routeDuration">-- min</span></span>
+                        </div>
+                    </div>
+                    <div id="offerMap" class="offer-map-container"></div>
+                </div>
+
+                <!-- Safety Guidelines Card -->
+                <div class="safety-card">
+                    <div class="safety-header">
+                        <div class="safety-icon-box">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <h3>Commute Community Safety Guidelines</h3>
+                    </div>
+                    <ul class="safety-list">
+                        <li class="safety-item">
+                            <i class="fas fa-circle-check safety-item-icon"></i>
+                            <div>
+                                <strong>Verify your identity:</strong> Maintain a verified profile so fellow students and professionals feel safe traveling with you.
+                            </div>
+                        </li>
+                        <li class="safety-item">
+                            <i class="fas fa-circle-check safety-item-icon"></i>
+                            <div>
+                                <strong>Share accurate details:</strong> Set exact pickup spots and stick strictly to your declared departure schedule.
+                            </div>
+                        </li>
+                        <li class="safety-item">
+                            <i class="fas fa-circle-check safety-item-icon"></i>
+                            <div>
+                                <strong>Be respectful and honest:</strong> Follow road safety laws, avoid overspeeding, and charge fair non-commercial shared fares.
+                            </div>
+                        </li>
+                        <li class="safety-item">
+                            <i class="fas fa-circle-check safety-item-icon"></i>
+                            <div>
+                                <strong>Follow community standards:</strong> Maintain mutual respect; we have zero tolerance for discrimination or harassment.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/offer-ride.js"></script>
+</body>
+</html>

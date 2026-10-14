@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Smart Commute Kolhapur</title>
+
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6.4 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Shared Style -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --primary-dark: #1e3a8a;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #1e40af;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-container {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo i {
+      color: var(--primary-light);
+    }
+    .admin-badge-pill {
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 0.725rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    .nav-auth {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--primary); color: #ffffff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: #ffffff; border-color: var(--border); color: var(--text); }
+    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-danger { background: #fee2e2; color: var(--danger); border-color: #fecaca; }
+    .btn-danger:hover { background: var(--danger); color: #ffffff; }
+    .btn-success { background: #dcfce7; color: var(--success); border-color: #bbf7d0; }
+    .btn-success:hover { background: var(--success); color: #ffffff; }
+    .btn-sm { padding: 5px 10px; font-size: 0.8rem; border-radius: 6px; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
+    .badge-info { background: #e0f2fe; color: #0369a1; }
+    .badge-primary { background: #dbeafe; color: #1e40af; }
+
+    /* Admin Layout */
+    .admin-layout {
+      max-width: 1520px;
+      margin: 24px auto 60px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+      align-items: start;
+      width: 100%;
+    }
+
+    /* Dark Left Sidebar */
+    .admin-sidebar {
+      background: var(--sidebar-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: #f8fafc;
+      overflow: hidden;
+      position: sticky;
+      top: 92px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header-box {
+      padding: 24px 20px 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .admin-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      color: white;
+    }
+    .admin-brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .admin-brand-sub {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .admin-nav {
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .admin-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.925rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+    .admin-nav-link i {
+      width: 20px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .admin-nav-link:hover {
+      background: var(--sidebar-hover);
+      color: #ffffff;
+    }
+    .admin-nav-link.active {
+      background: var(--sidebar-active);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+    }
+    .admin-nav-link.logout-link {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
+      color: #f87171;
+    }
+    .admin-nav-link.logout-link:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+    }
+
+    /* Main Content Area */
+    .admin-main {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Content Header */
+    .admin-header {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 22px 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .admin-title-wrap h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-title-wrap p {
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .admin-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .admin-select {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+    }
+
+    /* Stats Grid */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 1200px) {
+      .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .admin-stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .admin-stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .admin-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .stat-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .stat-badge-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .stat-badge-icon.blue { background: #eff6ff; color: #2563eb; }
+    .stat-badge-icon.green { background: #ecfdf5; color: #059669; }
+    .stat-badge-icon.purple { background: #faf5ff; color: #9333ea; }
+    .stat-badge-icon.red { background: #fef2f2; color: #dc2626; }
+
+    .stat-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .stat-card-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+      margin-top: 4px;
+    }
+    .stat-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 0.8rem;
+    }
+    .sparkline-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+    .sparkline-indicator.positive { color: #16a34a; }
+    .sparkline-indicator.negative { color: #dc2626; }
+    .sparkline-indicator.neutral { color: #64748b; }
+
+    /* Visual Charts Section */
+    .admin-charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .admin-charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .chart-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: normal;
+    }
+
+    /* CSS Pure Bar Chart */
+    .bar-chart-container {
+      height: 220px;
+      display: flex;
+      align-items: flex-end;
+      gap: 18px;
+      padding: 10px 10px 0 10px;
+      border-bottom: 2px solid var(--border);
+      position: relative;
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .bar-fill {
+      width: 100%;
+      max-width: 48px;
+      background: linear-gradient(180deg, #3b82f6 0%, #1e40af 100%);
+      border-radius: 6px 6px 0 0;
+      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
+      cursor: pointer;
+      position: relative;
+      min-height: 8px;
+    }
+    .bar-fill:hover {
+      background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+    }
+    .bar-tooltip {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .bar-fill:hover .bar-tooltip {
+      opacity: 1;
+    }
+    .bar-label {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* CSS Pure Donut Chart */
+    .donut-chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 20px;
+    }
+    .donut-visual {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #1e40af 0% 58%,
+        #06b6d4 58% 90%,
+        #94a3b8 90% 100%
+      );
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .donut-hole {
+      width: 90px;
+      height: 90px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-hole-count {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+    .donut-hole-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+    .legend-color-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .legend-dot.blue { background: #1e40af; }
+    .legend-dot.cyan { background: #06b6d4; }
+    .legend-dot.gray { background: #94a3b8; }
+    .legend-pct {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Tables Card */
+    .admin-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header-bar {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .card-header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .table-search-input {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      width: 240px;
+      outline: none;
+      font-family: inherit;
+    }
+    .table-search-input:focus {
+      border-color: var(--primary-light);
+    }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .admin-table th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+    }
+    .admin-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .admin-table tr:hover td {
+      background: #fcfdfe;
+    }
+
+    /* Views */
+    .admin-view-pane {
+      display: none;
+    }
+    .admin-view-pane.active-pane {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-box {
+      background: #ffffff;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.2s ease;
+    }
+    .modal-overlay.open .modal-box {
+      transform: translateY(0);
+    }
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+    .modal-close-btn:hover { color: var(--text); }
+    .modal-body {
+      padding: 24px;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: #f8fafc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+      .admin-sidebar {
+        position: static;
+      }
+      .admin-nav {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      }
+      .admin-nav-link.logout-link {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <i class="fas fa-shield-alt"></i> Smart Commute
+        <span class="admin-badge-pill">ADMIN</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/find-ride.html">Find Ride</a>
+        <a href="/offer-ride.html">Offer Ride</a>
+        <a href="/dashboard.html">User Portal</a>
+      </div>
+      <div class="nav-auth">
+        <!-- Rendered by app.js updateNavbar() -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Admin Layout -->
+  <main class="admin-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header-box">
+        <div class="admin-logo-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <div>
+          <div class="admin-brand-title">Control Center</div>
+          <div class="admin-brand-sub">Kolhapur Network</div>
+        </div>
+      </div>
+
+      <nav class="admin-nav">
+        <button class="admin-nav-link active" data-view="view-dashboard">
+          <i class="fas fa-th-large"></i> Dashboard
+        </button>
+        <button class="admin-nav-link" data-view="view-users">
+          <i class="fas fa-users"></i> Users
+        </button>
+        <button class="admin-nav-link" data-view="view-rides">
+          <i class="fas fa-car"></i> Rides
+        </button>
+        <button class="admin-nav-link" data-view="view-bookings">
+          <i class="fas fa-ticket"></i> Bookings
+        </button>
+        <button class="admin-nav-link" data-view="view-reports">
+          <i class="fas fa-flag"></i> Reports
+        </button>
+        <button class="admin-nav-link" data-view="view-feedback">
+          <i class="fas fa-comments"></i> Feedback
+        </button>
+        <button class="admin-nav-link" data-view="view-settings">
+          <i class="fas fa-cog"></i> Settings
+        </button>
+        <button class="admin-nav-link logout-link" id="admin-sidebar-logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </nav>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <div class="admin-main">
+
+      <!-- VIEW 1: DASHBOARD OVERVIEW -->
+      <div id="view-dashboard" class="admin-view-pane active-pane">
+        
+        <!-- Header -->
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-chart-line text-primary"></i> Admin Dashboard</h1>
+            <p>Overview of platform activity and city-wide commute metrics</p>
+          </div>
+          <div class="admin-controls">
+            <select class="admin-select" id="date-range-filter">
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+            <button class="btn btn-outline" id="refresh-dashboard-btn" title="Refresh Live Data">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </header>
+
+        <!-- Stats Grid (4 Cards) -->
+        <div class="admin-stats-grid" style="margin-top: 24px;">
+          
+          <!-- Card 1: Total Users -->
+          <div class="admin-stat-card">
+            <div class="stat-card-top">
+              <div>
+                <span class="stat-card-title">Total Users</span>
+                <div class="stat-card-number" id="stat-admin-users">0</div>
+              </div>
+              <div class="stat-badge-icon blue">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <div class="stat-card-bottom">
+              <span class="sparkline-indicator positive">
+                <i class="fas fa-arrow-up"></i> +14.2%
+              </span>
+              <span style="color: var(--text-muted);">vs last week</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Active Rides -->
+          <div class="admin-stat-card">
+            <div class="stat-card-top">
+              <div>
+                <span class="stat-card-title">Active Rides</span>
+                <div class="stat-card-number" id="stat-admin-rides">0</div>
+              </div>
+              <div class="stat-badge-icon green">
+                <i class="fas fa-car"></i>
+              </div>
+            </div>
+            <div class="stat-card-bottom">
+              <span class="sparkline-indicator positive">
+                <i class="fas fa-arrow-up"></i> +8.5%
+              </span>
+              <span style="color: var(--text-muted);">across Kolhapur</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Rides Today -->
+          <div class="admin-stat-card">
+            <div class="stat-card-top">
+              <div>
+                <span class="stat-card-title">Rides Today</span>
+                <div class="stat-card-number" id="stat-admin-today">0</div>
+              </div>
+              <div class="stat-badge-icon purple">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+            </div>
+            <div class="stat-card-bottom">
+              <span class="sparkline-indicator neutral">
+                <i class="fas fa-minus"></i> Active schedule
+              </span>
+              <span style="color: var(--text-muted);">today</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Reports -->
+          <div class="admin-stat-card">
+            <div class="stat-card-top">
+              <div>
+                <span class="stat-card-title">User Reports</span>
+                <div class="stat-card-number" id="stat-admin-reports">0</div>
+              </div>
+              <div class="stat-badge-icon red">
+                <i class="fas fa-flag"></i>
+              </div>
+            </div>
+            <div class="stat-card-bottom">
+              <span class="sparkline-indicator negative" id="stat-reports-pending-text">
+                <i class="fas fa-exclamation-circle"></i> Requires attention
+              </span>
+              <span style="color: var(--text-muted);">safety queue</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Charts Grid (Pure CSS Bar Chart + Pure CSS Conic Donut) -->
+        <div class="admin-charts-grid" style="margin-top: 24px;">
+          
+          <!-- Ride Activity Bar Chart -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title"><i class="fas fa-chart-bar" style="color: #3b82f6;"></i> Ride Activity</h3>
+                <span class="chart-subtitle">Daily completed & booked rides (Last 7 Days)</span>
+              </div>
+              <span class="badge badge-primary">Mon - Sun</span>
+            </div>
+
+            <div class="bar-chart-container" id="activity-bar-chart">
+              <!-- Rendered via CSS bars by admin.js -->
+            </div>
+          </div>
+
+          <!-- User Distribution Donut Chart -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3 class="chart-card-title"><i class="fas fa-chart-pie" style="color: #06b6d4;"></i> User Distribution</h3>
+                <span class="chart-subtitle">Commuter profile types</span>
+              </div>
+            </div>
+
+            <div class="donut-chart-container">
+              <div class="donut-visual" id="admin-donut-visual">
+                <div class="donut-hole">
+                  <span class="donut-hole-count" id="donut-total-users">0</span>
+                  <span class="donut-hole-label">Members</span>
+                </div>
+              </div>
+
+              <div class="donut-legend">
+                <div class="legend-item">
+                  <div class="legend-color-label">
+                    <span class="legend-dot blue"></span>
+                    <span>College Students</span>
+                  </div>
+                  <span class="legend-pct" id="pct-students">58%</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color-label">
+                    <span class="legend-dot cyan"></span>
+                    <span>Working Professionals</span>
+                  </div>
+                  <span class="legend-pct" id="pct-professionals">32%</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color-label">
+                    <span class="legend-dot gray"></span>
+                    <span>General Commuters</span>
+                  </div>
+                  <span class="legend-pct" id="pct-others">10%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Recent Rides Table -->
+        <div class="admin-card" style="margin-top: 24px;">
+          <div class="card-header-bar">
+            <div class="card-header-title">
+              <i class="fas fa-car" style="color: var(--primary);"></i> Recent Rides
+            </div>
+            <a href="#" class="btn btn-outline btn-sm view-all-rides-link">View All Rides</a>
+          </div>
+
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ride ID</th>
+                  <th>Driver</th>
+                  <th>Route</th>
+                  <th>Date & Time</th>
+                  <th>Vehicle</th>
+                  <th>Fare</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recent-rides-tbody">
+                <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading recent rides...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Reports Table -->
+        <div class="admin-card" style="margin-top: 24px;">
+          <div class="card-header-bar">
+            <div class="card-header-title">
+              <i class="fas fa-flag" style="color: var(--danger);"></i> Recent Safety & Trust Reports
+            </div>
+            <a href="#" class="btn btn-outline btn-sm view-all-reports-link">Manage Reports</a>
+          </div>
+
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Report ID</th>
+                  <th>Reporter</th>
+                  <th>Reported User</th>
+                  <th>Reason</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recent-reports-tbody">
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading recent reports...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- VIEW 2: USERS MANAGEMENT -->
+      <div id="view-users" class="admin-view-pane">
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-users text-primary"></i> User Management</h1>
+            <p>Verify commuter IDs, manage college student accounts, and enforce safety bans</p>
+          </div>
+          <div class="admin-controls">
+            <input type="text" id="user-search-input" class="table-search-input" placeholder="Search by name, email, mobile...">
+            <select id="user-filter-status" class="admin-select">
+              <option value="all">All Users</option>
+              <option value="verified">Verified</option>
+              <option value="unverified">Unverified</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="admin-card" style="margin-top: 24px;">
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                  <th>Status</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="all-users-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: RIDES MANAGEMENT -->
+      <div id="view-rides" class="admin-view-pane">
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-car text-primary"></i> Rides Management</h1>
+            <p>Monitor all active, scheduled, and past trips across Kolhapur</p>
+          </div>
+          <div class="admin-controls">
+            <input type="text" id="rides-search-input" class="table-search-input" placeholder="Search route or driver...">
+            <select id="rides-filter-status" class="admin-select">
+              <option value="all">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="admin-card" style="margin-top: 24px;">
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ride ID</th>
+                  <th>Driver</th>
+                  <th>Route</th>
+                  <th>Date & Time</th>
+                  <th>Vehicle</th>
+                  <th>Seats</th>
+                  <th>Fare</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="all-rides-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 4: BOOKINGS MANAGEMENT -->
+      <div id="view-bookings" class="admin-view-pane">
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-ticket text-primary"></i> Bookings Management</h1>
+            <p>Track passenger reservations, seat confirmations, and trip receipts</p>
+          </div>
+        </header>
+
+        <div class="admin-card" style="margin-top: 24px;">
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Passenger</th>
+                  <th>Ride Route</th>
+                  <th>Seats</th>
+                  <th>Booking Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="all-bookings-tbody">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading bookings...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 5: REPORTS MANAGEMENT -->
+      <div id="view-reports" class="admin-view-pane">
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-flag text-danger"></i> Reports & Escalations</h1>
+            <p>Review safety flags, improper cancellations, or vehicle complaints</p>
+          </div>
+          <div class="admin-controls">
+            <select id="reports-filter-status" class="admin-select">
+              <option value="all">All Reports</option>
+              <option value="pending">Pending</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="admin-card" style="margin-top: 24px;">
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Report ID</th>
+                  <th>Reporter</th>
+                  <th>Reported User</th>
+                  <th>Reason</th>
+                  <th>Date Filed</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="all-reports-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 6: FEEDBACK -->
+      <div id="view-feedback" class="admin-view-pane">
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-comments text-primary"></i> Commuter Feedback</h1>
+            <p>Suggestions, ratings, and experience reviews from Kolhapur commuters</p>
+          </div>
+        </header>
+
+        <div class="admin-card" style="margin-top: 24px; padding: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <strong>Pooja Deshmukh (KIT College)</strong>
+                <span style="color: #f59e0b;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+              </div>
+              <p style="font-size: 0.9rem; color: var(--text-muted);">
+                "Carpooling to Shivaji University every morning has cut down travel expenses significantly. The female-preference feature is especially appreciated!"
+              </p>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <strong>Rahul Patil (Tarabai Park)</strong>
+                <span style="color: #f59e0b;"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span>
+              </div>
+              <p style="font-size: 0.9rem; color: var(--text-muted);">
+                "Great platform for daily commute to Shiroli MIDC. Would love to see additional station markers near Dabholkar Corner."
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 7: SETTINGS -->
+      <div id="view-settings" class="admin-view-pane">
+        <header class="admin-header">
+          <div class="admin-title-wrap">
+            <h1><i class="fas fa-cog text-primary"></i> System Settings</h1>
+            <p>Platform parameters, auto-moderation thresholds, and station database</p>
+          </div>
+        </header>
+
+        <div class="admin-card" style="margin-top: 24px; padding: 24px;">
+          <div style="display: flex; flex-direction: column; gap: 18px; max-width: 600px;">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>Auto-Verify College Email Domains (.edu / .ac.in)</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Automatically grant verified student badge upon registration.</p>
+              </div>
+              <input type="checkbox" checked style="width: 20px; height: 20px; accent-color: var(--primary);">
+            </label>
+            <hr style="border: none; border-top: 1px solid var(--border);">
+            <label style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>Maximum Fare Cap per Km (₹)</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Ensure rideshare fares remain strictly non-commercial.</p>
+              </div>
+              <input type="number" value="6" style="width: 80px; padding: 6px; border: 1px solid var(--border); border-radius: 6px;">
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Review Report Modal -->
+  <div class="modal-overlay" id="reviewReportModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Review Safety Report</h3>
+        <button class="modal-close-btn" id="closeReportModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="report-modal-content" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <form id="update-report-form" style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <input type="hidden" id="modal-report-id">
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 600;">Update Status</label>
+            <select id="modal-report-status" class="admin-select" style="width: 100%; margin-top: 4px;">
+              <option value="pending">Pending</option>
+              <option value="reviewed">Reviewed</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 600;">Admin Action / Note</label>
+            <textarea id="modal-report-notes" rows="3" class="table-search-input" style="width: 100%; margin-top: 4px;" placeholder="Optional note for resolution record..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 6px;">
+            <i class="fas fa-check"></i> Save Report Resolution
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/app.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

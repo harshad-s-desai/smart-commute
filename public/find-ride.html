@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find a Ride - Smart Commute</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6.4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Project Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Specific Styles for 3-Column Find Ride Interface */
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Layout */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s ease;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        .btn-outline {
+            border-color: var(--border);
+            color: var(--text);
+            background: transparent;
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: #f8fafc;
+        }
+        .btn-sm {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.825rem;
+        }
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            cursor: pointer;
+        }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* 3-Column Main Layout */
+        .find-ride-wrapper {
+            flex: 1;
+            max-width: 1540px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.25rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .find-ride-layout {
+            display: grid;
+            grid-template-columns: 320px minmax(420px, 1fr) minmax(360px, 480px);
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        /* Responsive View Toggle on Mobile/Tablet */
+        .mobile-view-toggle {
+            display: none;
+            margin-bottom: 1rem;
+            background: #ffffff;
+            padding: 0.35rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        .mobile-view-toggle button {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-radius: 0.35rem;
+            cursor: pointer;
+        }
+        .mobile-view-toggle button.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* Left Column: Search & Filters */
+        .find-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-with-icon i.input-icon {
+            position: absolute;
+            left: 0.85rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: #ffffff;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            box-sizing: border-box;
+        }
+        .form-input.no-icon {
+            padding-left: 0.85rem;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Autocomplete dropdown positioning */
+        .autocomplete-wrapper {
+            position: relative;
+        }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            z-index: 1050;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
+        .autocomplete-header {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: #f8fafc;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .autocomplete-item {
+            padding: 0.6rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.12s ease;
+        }
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-item:hover, .autocomplete-item.active {
+            background-color: #f0f7ff;
+        }
+        .autocomplete-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .autocomplete-item-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .autocomplete-item-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .autocomplete-item-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .autocomplete-loading, .autocomplete-empty {
+            padding: 0.85rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Filter Controls */
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .filter-title {
+            font-size: 0.825rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-checkbox-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.875rem;
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
+        }
+        .custom-checkbox input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Pill Radio Buttons (Seats) */
+        .seat-pills {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+        }
+        .seat-pill {
+            text-align: center;
+            padding: 0.45rem 0.25rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: #ffffff;
+            transition: all 0.15s ease;
+        }
+        .seat-pill:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+        .seat-pill.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        /* Price Slider */
+        .slider-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .fare-slider {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            outline: none;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Reset link */
+        .btn-text-sm {
+            background: none;
+            border: none;
+            color: var(--primary-light);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+        }
+        .btn-text-sm:hover {
+            text-decoration: underline;
+        }
+
+        /* Center Column: Ride Results Header & Cards */
+        .find-center {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .results-header-card {
+            background: #ffffff;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .results-count-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .results-count-title span.count-highlight {
+            color: var(--primary);
+            background: #eff6ff;
+            padding: 0.15rem 0.55rem;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+        }
+        .results-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sort-select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .sort-select-wrapper select {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.4rem;
+            font-size: 0.85rem;
+            background: #fff;
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .view-btn-group {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 0.4rem;
+            overflow: hidden;
+        }
+        .view-btn-group button {
+            border: none;
+            background: #fff;
+            padding: 0.4rem 0.65rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .view-btn-group button.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* Ride Cards List */
+        .rides-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ride-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .ride-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: 0 6px 16px -2px rgba(30, 64, 175, 0.08);
+            transform: translateY(-2px);
+        }
+        .ride-card.active-card {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.25);
+            background: #fafcff;
+        }
+
+        .ride-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #f1f5f9;
+            padding-bottom: 0.85rem;
+        }
+        .driver-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .driver-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(30,64,175,0.2);
+            flex-shrink: 0;
+        }
+        .driver-meta h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .driver-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: var(--warning);
+            font-weight: 600;
+            margin-top: 0.15rem;
+        }
+        .driver-rating span.rating-num {
+            color: var(--text);
+            margin-left: 0.2rem;
+        }
+        .driver-rating span.rides-count {
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.55rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+        }
+        .badge-info {
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+        .badge-warning {
+            background-color: #fffbeb;
+            color: #92400e;
+        }
+        .badge-female {
+            background-color: #fdf2f8;
+            color: #9d174d;
+            border: 1px solid #fbcfe8;
+        }
+
+        /* Route Row */
+        .ride-route-container {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .ride-route-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            position: relative;
+            padding-left: 1.25rem;
+        }
+        .ride-route-timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: #cbd5e1;
+        }
+        .timeline-stop {
+            position: relative;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .timeline-stop::before {
+            content: '';
+            position: absolute;
+            left: -1.25rem;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2.5px solid #10b981;
+            z-index: 1;
+        }
+        .timeline-stop.dest::before {
+            border-color: #ef4444;
+        }
+        .stop-name {
+            font-size: 0.925rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .stop-time {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .ride-price-box {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .ride-price {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .ride-price-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+
+        /* Card Footer: Vehicle + Seats + Action Button */
+        .ride-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.85rem;
+            border-top: 1px solid #f1f5f9;
+        }
+        .ride-features {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .feature-item i {
+            color: var(--primary);
+        }
+        .seats-tag {
+            color: #047857;
+            font-weight: 600;
+            background: #ecfdf5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.35rem;
+        }
+
+        /* Transport Comparison Section */
+        .comparison-section {
+            background: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .comparison-header {
+            margin-bottom: 1.25rem;
+        }
+        .comparison-header h3 {
+            margin: 0 0 0.35rem 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .comparison-header p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .comparison-card {
+            border: 1px solid var(--border);
+            border-radius: 0.65rem;
+            padding: 1rem;
+            background: #fafcff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .comparison-card.highlight {
+            border-color: var(--primary-light);
+            background: #f0f7ff;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.08);
+        }
+        .comp-icon-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 0.75rem;
+        }
+        .comp-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 0.25rem 0;
+        }
+        .comp-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.02em;
+        }
+        .comp-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .comp-stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.825rem;
+        }
+        .comp-stat-label {
+            color: var(--text-muted);
+        }
+        .comp-stat-val {
+            font-weight: 700;
+            color: var(--text);
+        }
+        .comp-stat-val.price {
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        /* Right Column: Leaflet Map */
+        .find-map-column {
+            position: sticky;
+            top: 5rem;
+            height: calc(100vh - 6.5rem);
+            min-height: 540px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .map-container {
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            z-index: 10;
+        }
+        .map-header-bar {
+            padding: 0.75rem 1rem;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 20;
+        }
+        .map-header-bar span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .map-stats-chip {
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Custom Map Pin Styles */
+        .custom-map-pin-wrapper {
+            position: relative;
+        }
+        .custom-map-pin {
+            width: 32px;
+            height: 32px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            border: 2px solid #ffffff;
+            color: #ffffff;
+        }
+        .custom-map-pin i {
+            transform: rotate(45deg);
+            font-size: 14px;
+        }
+        .custom-map-pin-pulse {
+            position: absolute;
+            left: 8px;
+            bottom: -3px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #1e40af;
+            opacity: 0.7;
+            transform: scale(0.8);
+            animation: pinPulse 2s infinite ease-out;
+        }
+        @keyframes pinPulse {
+            0% { transform: scale(0.6); opacity: 0.9; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Custom Leaflet Popup */
+        .custom-leaflet-popup .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 0;
+        }
+        .custom-leaflet-popup .leaflet-popup-content {
+            margin: 0;
+            padding: 0.75rem 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Empty & Loading states */
+        .state-container {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px dashed var(--border);
+        }
+        .state-icon {
+            font-size: 2.5rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+        .state-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 0.5rem 0;
+        }
+        .state-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin: 0 0 1.25rem 0;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Booking Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-box {
+            background: #ffffff;
+            border-radius: 0.85rem;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+        .modal-overlay.open .modal-box {
+            transform: scale(1);
+        }
+        .modal-header {
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        .modal-body {
+            padding: 1.5rem;
+        }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            background: #ffffff;
+            border-radius: 0.5rem;
+            padding: 0.85rem 1.2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            min-width: 280px;
+            max-width: 420px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.25s ease;
+            border-left: 4px solid var(--primary);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success { border-left-color: var(--success); }
+        .toast-error { border-left-color: var(--danger); }
+        .toast-warning { border-left-color: var(--warning); }
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            .find-ride-layout {
+                grid-template-columns: 290px 1fr;
+            }
+            .find-map-column {
+                position: static;
+                height: 440px;
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .mobile-view-toggle {
+                display: flex;
+            }
+            .find-ride-layout {
+                display: flex;
+                flex-direction: column;
+            }
+            .find-sidebar, .find-center, .find-map-column {
+                width: 100%;
+            }
+            .find-map-column {
+                height: 380px;
+            }
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Common Application Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <i class="fas fa-route"></i> Smart Commute
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/find-ride.html" class="active">Find Ride</a>
+                <a href="/offer-ride.html">Offer Ride</a>
+                <a href="/dashboard.html">My Rides</a>
+            </div>
+            <div class="nav-auth" id="navAuth">
+                <a href="/login.html" class="btn btn-outline">Login</a>
+                <a href="/login.html#signup" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Find Ride Wrapper -->
+    <main class="find-ride-wrapper">
+        <!-- Mobile View Toggles (List vs Map) -->
+        <div class="mobile-view-toggle">
+            <button id="mobileViewList" class="active"><i class="fas fa-list"></i> List View</button>
+            <button id="mobileViewMap"><i class="fas fa-map-location-dot"></i> Map View</button>
+        </div>
+
+        <div class="find-ride-layout">
+
+            <!-- ============================================== -->
+            <!-- LEFT COLUMN: Search Form & Filters             -->
+            <!-- ============================================== -->
+            <aside class="find-sidebar" id="findSidebar">
+                <!-- Search Box Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-magnifying-glass text-primary"></i> Search Commute</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="searchRidesForm" autocomplete="off">
+                            <!-- Origin Input -->
+                            <div class="form-group autocomplete-wrapper">
+                                <label class="form-label" for="originInput">From (Pickup)</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-circle-dot input-icon" style="color: #10b981;"></i>
+                                    <input type="text" id="originInput" class="form-input" placeholder="e.g. Shivaji University, CBS..." required>
+                                </div>
+                                <input type="hidden" id="originLat" name="origin_lat">
+                                <input type="hidden" id="originLng" name="origin_lng">
+                            </div>
+
+                            <!-- Destination Input (Optional for en-route matching) -->
+                            <div class="form-group autocomplete-wrapper">
+                                <label class="form-label" for="destInput">
+                                    To (Dropoff)
+                                    <span style="font-weight: 400; color: #64748b; font-size: 0.8rem;">(Optional)</span>
+                                </label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-location-dot input-icon" style="color: #ef4444;"></i>
+                                    <input type="text" id="destInput" class="form-input" placeholder="e.g. KIT College (or leave empty to see all passing rides)">
+                                </div>
+                                <input type="hidden" id="destLat" name="dest_lat">
+                                <input type="hidden" id="destLng" name="dest_lng">
+                            </div>
+
+                            <!-- En-Route Corridor Tip -->
+                            <div class="corridor-tip" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 0.5rem 0.75rem; margin-bottom: 0.85rem; font-size: 0.78rem; color: #166534; display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.35;">
+                                <i class="fas fa-route" style="margin-top: 2px; color: #16a34a;"></i>
+                                <span><strong>En-Route Engine:</strong> Enter only your pickup to see all drivers driving past your area and where they are heading!</span>
+                            </div>
+
+                            <!-- Date Input -->
+                            <div class="form-group">
+                                <label class="form-label" for="dateInput">Date</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar-alt input-icon"></i>
+                                    <input type="date" id="dateInput" class="form-input" required>
+                                </div>
+                            </div>
+
+                            <!-- Search Button -->
+                            <button type="submit" id="searchRidesBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                                <i class="fas fa-search"></i> Search Rides
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Filters Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-sliders text-primary"></i> Filters</h3>
+                        <button type="button" id="resetFiltersBtn" class="btn-text-sm">Reset</button>
+                    </div>
+                    <div class="card-body filter-section">
+
+                        <!-- Filter: Departure Time -->
+                        <div class="filter-group">
+                            <span class="filter-title">Departure Time</span>
+                            <div class="filter-checkbox-list">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="timeMorning" checked>
+                                    <span>Morning (6:00 AM - 12:00 PM)</span>
+                                </label>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="timeAfternoon" checked>
+                                    <span>Afternoon (12:00 PM - 6:00 PM)</span>
+                                </label>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="timeEvening" checked>
+                                    <span>Evening (6:00 PM - 12:00 AM)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Filter: Vehicle Type -->
+                        <div class="filter-group">
+                            <span class="filter-title">Vehicle Type</span>
+                            <div class="filter-checkbox-list">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="vehCar" value="car" checked>
+                                    <span><i class="fas fa-car text-primary"></i> Car</span>
+                                </label>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="vehBike" value="bike" checked>
+                                    <span><i class="fas fa-motorcycle text-warning"></i> Bike</span>
+                                </label>
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" id="vehAuto" value="auto" checked>
+                                    <span><i class="fas fa-car-side text-success"></i> Auto Rickshaw</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Filter: Available Seats -->
+                        <div class="filter-group">
+                            <span class="filter-title">Seats Needed</span>
+                            <div class="seat-pills" id="seatPills">
+                                <div class="seat-pill active" data-seats="any">Any</div>
+                                <div class="seat-pill" data-seats="1">1</div>
+                                <div class="seat-pill" data-seats="2">2</div>
+                                <div class="seat-pill" data-seats="3">3+</div>
+                            </div>
+                        </div>
+
+                        <!-- Filter: Max Fare -->
+                        <div class="filter-group">
+                            <div class="filter-title">
+                                <span>Max Fare</span>
+                                <span style="color: var(--primary); font-weight: 700;">₹<span id="fareValue">300</span></span>
+                            </div>
+                            <div class="slider-wrapper">
+                                <input type="range" id="fareSlider" class="fare-slider" min="20" max="300" step="10" value="300">
+                                <div class="slider-labels">
+                                    <span>₹20</span>
+                                    <span>₹300</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter: Gender Preference (Visible to all or highlighted for female) -->
+                        <div class="filter-group" id="genderPreferenceFilter">
+                            <span class="filter-title">Gender Preference</span>
+                            <select id="genderSelect" class="form-select no-icon" style="padding-left: 0.75rem;">
+                                <option value="any">Any Commuters</option>
+                                <option value="female">Female Commuters Only</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </aside>
+
+
+            <!-- ============================================== -->
+            <!-- CENTER COLUMN: Results & Comparison            -->
+            <!-- ============================================== -->
+            <section class="find-center" id="findCenter">
+
+                <!-- Results Header Bar -->
+                <div class="results-header-card">
+                    <h2 class="results-count-title">
+                        Found <span id="rideCount" class="count-highlight">0</span> rides
+                    </h2>
+                    <div class="results-actions">
+                        <div class="sort-select-wrapper">
+                            <label for="sortBySelect"><i class="fas fa-arrow-down-short-wide"></i> Sort:</label>
+                            <select id="sortBySelect">
+                                <option value="earliest">Earliest Departure</option>
+                                <option value="lowest_price">Lowest Price</option>
+                                <option value="seats">Available Seats</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rides Cards Container -->
+                <div class="rides-list" id="ridesList">
+                    <!-- Loading state rendered here -->
+                    <div class="state-container" id="ridesPlaceholder">
+                        <div class="state-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3 class="state-title">Looking for shared rides</h3>
+                        <p class="state-desc">Enter your pickup and drop points or search to view active rides offered by verified peers.</p>
+                    </div>
+                </div>
+
+                <!-- ============================================== -->
+                <!-- TRANSPORT COMPARISON SECTION                   -->
+                <!-- ============================================== -->
+                <div class="comparison-section" id="transitComparisonSection" style="display: none;">
+                    <div class="comparison-header">
+                        <h3><i class="fas fa-scale-balanced text-primary"></i> Transport Options Comparison</h3>
+                        <p>Estimated cost, time, and convenience comparison for this commute route</p>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <!-- Rideshare Card -->
+                        <div class="comparison-card highlight">
+                            <div>
+                                <div class="comp-icon-badge">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h4 class="comp-title">Smart Commute</h4>
+                                <span class="comp-tag"><i class="fas fa-leaf text-success"></i> Best Value & Eco</span>
+                            </div>
+                            <div class="comp-stats">
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Estimated Fare</span>
+                                    <span class="comp-stat-val price" id="compRideshareCost">₹40 - ₹60</span>
+                                </div>
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Travel Time</span>
+                                    <span class="comp-stat-val" id="compRideshareTime">~25 mins</span>
+                                </div>
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Availability</span>
+                                    <span class="comp-stat-val" id="compRideshareAvail">Shared car/bike</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Public Transport Card -->
+                        <div class="comparison-card">
+                            <div>
+                                <div class="comp-icon-badge" style="color: #f59e0b;">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                                <h4 class="comp-title">Public Bus / Transit</h4>
+                                <span class="comp-tag" style="color: #d97706;">Most Economical</span>
+                            </div>
+                            <div class="comp-stats">
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Estimated Fare</span>
+                                    <span class="comp-stat-val price" id="compPublicCost">₹15 - ₹20</span>
+                                </div>
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Travel Time</span>
+                                    <span class="comp-stat-val" id="compPublicTime">~45 mins</span>
+                                </div>
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Frequency</span>
+                                    <span class="comp-stat-val">Every 20-30 min</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Private Taxi Card -->
+                        <div class="comparison-card">
+                            <div>
+                                <div class="comp-icon-badge" style="color: #64748b;">
+                                    <i class="fas fa-taxi"></i>
+                                </div>
+                                <h4 class="comp-title">Private Taxi / Cab</h4>
+                                <span class="comp-tag" style="color: #64748b;">On-Demand Direct</span>
+                            </div>
+                            <div class="comp-stats">
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Estimated Fare</span>
+                                    <span class="comp-stat-val price" id="compTaxiCost">₹160 - ₹220</span>
+                                </div>
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Travel Time</span>
+                                    <span class="comp-stat-val" id="compTaxiTime">~22 mins</span>
+                                </div>
+                                <div class="comp-stat-row">
+                                    <span class="comp-stat-label">Availability</span>
+                                    <span class="comp-stat-val">Instant Booking</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- ============================================== -->
+            <!-- RIGHT COLUMN: Leaflet Map Preview              -->
+            <!-- ============================================== -->
+            <div class="find-map-column" id="findMapColumn">
+                <div class="map-header-bar">
+                    <span><i class="fas fa-map-location-dot text-primary"></i> Route Map</span>
+                    <span class="map-stats-chip" id="mapRouteMeta" style="display: none;">
+                        <i class="fas fa-route"></i> <span id="mapDistanceText">-- km</span>
+                    </span>
+                </div>
+                <div id="findMap" class="map-container"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Request Ride</h3>
+                <button type="button" class="modal-close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalRideDetails" style="margin-bottom: 1.25rem;">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="bookingSeats">Seats to Book</label>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <button type="button" id="bookSeatMinus" class="btn btn-outline" style="width: 38px; height: 38px; padding: 0;">-</button>
+                        <input type="number" id="bookingSeats" value="1" min="1" max="4" class="form-input no-icon" style="width: 70px; text-align: center; font-weight: 700;" readonly>
+                        <button type="button" id="bookSeatPlus" class="btn btn-outline" style="width: 38px; height: 38px; padding: 0;">+</button>
+                        <span id="seatsAvailableText" style="font-size: 0.85rem; color: var(--text-muted);">seats available</span>
+                    </div>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.85rem; display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span style="font-size: 0.9rem; font-weight: 600; color: var(--text);">Total Amount:</span>
+                    <span style="font-size: 1.3rem; font-weight: 800; color: var(--primary);" id="modalTotalFare">₹0</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelBookingBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmBookingBtn">
+                    <i class="fas fa-check"></i> Confirm Request
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/find-ride.js"></script>
+</body>
+</html>

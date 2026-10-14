@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - Smart Commute Kolhapur</title>
+  
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6.4 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Shared Style -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --primary-dark: #1e3a8a;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo i {
+      color: var(--primary-light);
+      font-size: 1.35rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+      position: relative;
+      padding: 6px 0;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary);
+    }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .nav-auth {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover {
+      background-color: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .btn-danger {
+      background-color: #fee2e2;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+    .btn-danger:hover {
+      background-color: var(--danger);
+      color: #ffffff;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.825rem;
+      border-radius: 6px;
+    }
+
+    /* User Menu Dropdown in Navbar */
+    .user-menu {
+      position: relative;
+    }
+    .user-menu-trigger {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .user-menu-trigger:hover {
+      background: #f8fafc;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .user-dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      width: 230px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      z-index: 1000;
+      padding: 8px 0;
+    }
+    .user-dropdown-menu.show {
+      display: block;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .dropdown-header {
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .dropdown-user-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .dropdown-user-email {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 6px 0;
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dropdown-item:hover {
+      background: #f1f5f9;
+      color: var(--primary);
+    }
+    .dropdown-item.logout-item {
+      color: var(--danger);
+    }
+    .dropdown-item.logout-item:hover {
+      background: #fef2f2;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
+    .badge-info { background: #e0f2fe; color: #0369a1; }
+    .badge-primary { background: #dbeafe; color: #1e40af; }
+
+    /* Dashboard Layout */
+    .dashboard-layout {
+      max-width: 1380px;
+      margin: 28px auto 60px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+      align-items: start;
+      width: 100%;
+    }
+
+    /* Left Sidebar */
+    .dashboard-sidebar {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 24px 16px;
+      position: sticky;
+      top: 94px;
+    }
+    .user-profile-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .profile-avatar-large {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+    }
+    .profile-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .profile-role {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+    .sidebar-link i {
+      width: 20px;
+      font-size: 1.1rem;
+      text-align: center;
+      color: #94a3b8;
+      transition: color 0.2s;
+    }
+    .sidebar-link:hover {
+      background-color: #f8fafc;
+      color: var(--primary);
+    }
+    .sidebar-link:hover i {
+      color: var(--primary);
+    }
+    .sidebar-link.active {
+      background-color: #eff6ff;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .sidebar-link.active i {
+      color: var(--primary);
+    }
+    .sidebar-link.logout-link {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      color: var(--danger);
+    }
+    .sidebar-link.logout-link i {
+      color: var(--danger);
+    }
+    .sidebar-link.logout-link:hover {
+      background-color: #fef2f2;
+    }
+
+    /* Main Content */
+    .dashboard-main {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header */
+    .content-header {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header-greeting h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.02em;
+    }
+    .header-greeting p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Stats Grid & Impact Row */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.25fr;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .stat-icon.blue { background: #eff6ff; color: #2563eb; }
+    .stat-icon.green { background: #f0fdf4; color: #16a34a; }
+    .stat-icon.purple { background: #faf5ff; color: #9333ea; }
+    .stat-icon.emerald { background: #ecfdf5; color: #059669; }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-label {
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stat-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+      margin-top: 4px;
+    }
+
+    /* Your Impact Card */
+    .impact-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 10px 20px -5px rgba(30, 64, 175, 0.35);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .impact-card::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 140px;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+    .impact-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .impact-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .impact-badge {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .impact-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .impact-metric {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+    }
+    .impact-metric-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      display: block;
+    }
+    .impact-metric-lbl {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .impact-footer {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Tabs Card */
+    .rides-section-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .tabs-header {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: #fcfdfe;
+      padding: 0 20px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 18px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .tab-badge {
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .tab-btn.active .tab-badge {
+      background: #dbeafe;
+      color: var(--primary);
+    }
+
+    .tab-content {
+      padding: 24px;
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Ride Cards */
+    .rides-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ride-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .ride-card:hover {
+      box-shadow: var(--shadow);
+      border-color: #cbd5e1;
+    }
+    .ride-card-left {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+    .ride-datetime-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .ride-date-chip {
+      background: #f1f5f9;
+      color: var(--text);
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.825rem;
+    }
+    .ride-route {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .route-arrow {
+      color: var(--primary-light);
+      font-size: 0.9rem;
+    }
+    .ride-specs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .spec-item i {
+      color: #94a3b8;
+    }
+    .ride-card-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .ride-price-tag {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .ride-price-tag span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .ride-card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+    .empty-icon {
+      font-size: 3.2rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+    .empty-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .empty-subtitle {
+      font-size: 0.9rem;
+      max-width: 380px;
+      margin: 0 auto 20px auto;
+    }
+
+    /* View Sections (For sidebar switching) */
+    .dashboard-view-section {
+      display: none;
+    }
+    .dashboard-view-section.active-section {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Profile Card / Form */
+    .profile-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .form-input, .form-select {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.925rem;
+      color: var(--text);
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+    .form-input[disabled] {
+      background: #f8fafc;
+      cursor: not-allowed;
+      color: #94a3b8;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: #ffffff;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.2s ease;
+    }
+    .modal-overlay.open .modal-content {
+      transform: translateY(0);
+    }
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #94a3b8;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close-btn:hover { color: var(--text); }
+    .modal-body {
+      padding: 24px;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: #f8fafc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Saved Locations list */
+    .locations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .location-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .location-box-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .location-box-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+      .dashboard-sidebar {
+        position: static;
+      }
+      .sidebar-nav {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
+      }
+      .sidebar-link.logout-link {
+        margin-top: 0;
+        padding-top: 12px;
+        border-top: none;
+      }
+      .ride-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .ride-card-right {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--border);
+        padding-top: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <i class="fas fa-route"></i> Smart Commute
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/find-ride.html">Find Ride</a>
+        <a href="/offer-ride.html">Offer Ride</a>
+        <a href="/dashboard.html" class="active">My Rides</a>
+      </div>
+      <div class="nav-auth">
+        <!-- Rendered by app.js updateNavbar() -->
+        <a href="/login.html" class="btn btn-outline">Login</a>
+        <a href="/login.html#signup" class="btn btn-primary">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Container -->
+  <main class="dashboard-layout">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="dashboard-sidebar">
+      <div class="user-profile-preview">
+        <div class="profile-avatar-large" id="sidebar-avatar">U</div>
+        <div class="profile-name">
+          <span id="sidebar-name">User</span>
+          <i class="fas fa-check-circle text-success" title="Verified Commuter" style="color: #10b981; font-size: 0.95rem;"></i>
+        </div>
+        <div class="profile-role" id="sidebar-role">Kolhapur Commuter</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="sidebar-link active" data-target="section-dashboard">
+          <i class="fas fa-th-large"></i> Dashboard
+        </button>
+        <button class="sidebar-link" data-target="section-rides">
+          <i class="fas fa-car"></i> My Rides
+        </button>
+        <button class="sidebar-link" data-target="section-bookings">
+          <i class="fas fa-ticket"></i> My Bookings
+        </button>
+        <button class="sidebar-link" data-target="section-messages">
+          <i class="fas fa-envelope"></i> Messages
+        </button>
+        <button class="sidebar-link" data-target="section-saved-locations">
+          <i class="fas fa-map-marker-alt"></i> Saved Locations
+        </button>
+        <button class="sidebar-link" data-target="section-profile">
+          <i class="fas fa-user"></i> Profile
+        </button>
+        <button class="sidebar-link" data-target="section-settings">
+          <i class="fas fa-cog"></i> Settings
+        </button>
+        <button class="sidebar-link logout-link" id="sidebar-logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </nav>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <div class="dashboard-main">
+
+      <!-- SECTION 1: MAIN DASHBOARD VIEW -->
+      <div id="section-dashboard" class="dashboard-view-section active-section">
+        
+        <!-- Header -->
+        <header class="content-header">
+          <div class="header-greeting">
+            <h1>Hello, <span id="header-user-name">Commuter</span> 👋</h1>
+            <p>Here's your commute summary and active travel schedule</p>
+          </div>
+          <div class="header-actions">
+            <a href="/find-ride.html" class="btn btn-outline">
+              <i class="fas fa-search"></i> Find Ride
+            </a>
+            <a href="/offer-ride.html" class="btn btn-primary">
+              <i class="fas fa-plus-circle"></i> Offer Ride
+            </a>
+          </div>
+        </header>
+
+        <!-- Overview Grid (Stats + Impact) -->
+        <div class="overview-grid" style="margin-top: 24px;">
+          
+          <!-- 4 Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <i class="fas fa-calendar"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Upcoming Rides</span>
+                <span class="stat-value" id="stat-upcoming-rides">0</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <i class="fas fa-piggy-bank"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Saved</span>
+                <span class="stat-value" id="stat-total-saved">₹0</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon purple">
+                <i class="fas fa-ticket"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Bookings</span>
+                <span class="stat-value" id="stat-total-bookings">0</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon emerald">
+                <i class="fas fa-leaf"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">CO2 Reduced</span>
+                <span class="stat-value" id="stat-co2-reduced">0 kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Your Impact Card -->
+          <div class="impact-card">
+            <div>
+              <div class="impact-header">
+                <h3><i class="fas fa-seedling"></i> Your Impact</h3>
+                <span class="impact-badge"><i class="fas fa-shield-heart"></i> Eco Hero</span>
+              </div>
+              <div class="impact-metrics">
+                <div class="impact-metric">
+                  <span class="impact-metric-val" id="impact-money-saved">₹0</span>
+                  <span class="impact-metric-lbl">Money Saved</span>
+                </div>
+                <div class="impact-metric">
+                  <span class="impact-metric-val" id="impact-co2-saved">0 kg</span>
+                  <span class="impact-metric-lbl">CO2 Reduced</span>
+                </div>
+                <div class="impact-metric">
+                  <span class="impact-metric-val" id="impact-rides-shared">0</span>
+                  <span class="impact-metric-lbl">Rides Shared</span>
+                </div>
+                <div class="impact-metric">
+                  <span class="impact-metric-val" id="impact-people-connected">0</span>
+                  <span class="impact-metric-lbl">People Connected</span>
+                </div>
+              </div>
+            </div>
+            <div class="impact-footer">
+              <i class="fas fa-tree" style="color: #4ade80;"></i>
+              <span>Every shared commute cleans Kolhapur's air!</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Rides Management Tabs -->
+        <div class="rides-section-card" style="margin-top: 24px;">
+          <div class="tabs-header">
+            <button class="tab-btn active" data-tab="upcoming-tab">
+              <i class="fas fa-calendar-check"></i> Upcoming Rides
+              <span class="tab-badge" id="badge-upcoming-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="offered-tab">
+              <i class="fas fa-car-side"></i> Offered Rides
+              <span class="tab-badge" id="badge-offered-count">0</span>
+            </button>
+            <button class="tab-btn" data-tab="history-tab">
+              <i class="fas fa-history"></i> Ride History
+              <span class="tab-badge" id="badge-history-count">0</span>
+            </button>
+          </div>
+
+          <div class="tab-content">
+            <!-- Tab Pane 1: Upcoming Rides -->
+            <div id="upcoming-tab" class="tab-pane active">
+              <div id="upcoming-rides-list" class="rides-list">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Tab Pane 2: Offered Rides -->
+            <div id="offered-tab" class="tab-pane">
+              <div id="offered-rides-list" class="rides-list">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Tab Pane 3: Ride History -->
+            <div id="history-tab" class="tab-pane">
+              <div id="history-rides-list" class="rides-list">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECTION 2: MY RIDES (Dedicated view for driver offerings) -->
+      <div id="section-rides" class="dashboard-view-section">
+        <header class="content-header">
+          <div class="header-greeting">
+            <h1>My Offered Rides 🚗</h1>
+            <p>Manage and monitor rides you have posted for fellow commuters</p>
+          </div>
+          <div class="header-actions">
+            <a href="/offer-ride.html" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Post New Ride
+            </a>
+          </div>
+        </header>
+
+        <div class="profile-card" style="margin-top: 24px;">
+          <div id="dedicated-offered-list" class="rides-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: MY BOOKINGS -->
+      <div id="section-bookings" class="dashboard-view-section">
+        <header class="content-header">
+          <div class="header-greeting">
+            <h1>My Booked Seats 🎟️</h1>
+            <p>Check the status of rides you have booked as a passenger</p>
+          </div>
+          <div class="header-actions">
+            <a href="/find-ride.html" class="btn btn-primary">
+              <i class="fas fa-search"></i> Find More Rides
+            </a>
+          </div>
+        </header>
+
+        <div class="profile-card" style="margin-top: 24px;">
+          <div id="dedicated-bookings-list" class="rides-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: MESSAGES -->
+      <div id="section-messages" class="dashboard-view-section">
+        <header class="content-header">
+          <div class="header-greeting">
+            <h1>Messages 💬</h1>
+            <p>Chat directly with drivers and co-passengers</p>
+          </div>
+        </header>
+
+        <div class="profile-card" style="margin-top: 24px;">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-comments"></i></div>
+            <div class="empty-title">No New Messages</div>
+            <div class="empty-subtitle">When you book or offer a ride, passenger questions and updates will appear here.</div>
+            <a href="/find-ride.html" class="btn btn-outline btn-sm">Explore Rides</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: SAVED LOCATIONS -->
+      <div id="section-saved-locations" class="dashboard-view-section">
+        <header class="content-header">
+          <div class="header-greeting">
+            <h1>Saved Locations 📍</h1>
+            <p>Quickly autofill your daily commute points in Kolhapur</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" id="add-location-btn">
+              <i class="fas fa-plus"></i> Add New Place
+            </button>
+          </div>
+        </header>
+
+        <div class="profile-card" style="margin-top: 24px;">
+          <div class="locations-grid" id="saved-locations-container">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: PROFILE & PASSWORD -->
+      <div id="section-profile" class="dashboard-view-section">
+        
+        <!-- Edit Profile Card -->
+        <div class="profile-card">
+          <h2 class="section-title"><i class="fas fa-user-edit"></i> Personal Information</h2>
+          <p class="section-desc">Keep your contact and commute info up-to-date for smooth ride coordination.</p>
+
+          <form id="profile-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="profile-input-name">Full Name</label>
+                <input type="text" id="profile-input-name" class="form-input" required placeholder="Your full name">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profile-input-email">Email Address</label>
+                <input type="email" id="profile-input-email" class="form-input" disabled title="Email cannot be changed">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profile-input-mobile">Mobile Number</label>
+                <input type="tel" id="profile-input-mobile" class="form-input" required placeholder="10-digit mobile number">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profile-select-gender">Gender</label>
+                <select id="profile-select-gender" class="form-select">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profile-input-age">Age</label>
+                <input type="number" id="profile-input-age" class="form-input" min="16" max="100" placeholder="e.g. 21">
+              </div>
+
+              <div class="form-group" style="display: flex; align-items: flex-end;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 44px;">
+                  <i class="fas fa-save"></i> Save Profile Changes
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="profile-card">
+          <h2 class="section-title"><i class="fas fa-lock"></i> Security & Password</h2>
+          <p class="section-desc">Ensure your account is secure with a strong password.</p>
+
+          <form id="password-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="pwd-current">Current Password</label>
+                <input type="password" id="pwd-current" class="form-input" required placeholder="••••••••">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pwd-new">New Password</label>
+                <input type="password" id="pwd-new" class="form-input" minlength="6" required placeholder="At least 6 characters">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="pwd-confirm">Confirm New Password</label>
+                <input type="password" id="pwd-confirm" class="form-input" minlength="6" required placeholder="Confirm new password">
+              </div>
+
+              <div class="form-group" style="display: flex; align-items: flex-end;">
+                <button type="submit" class="btn btn-outline" style="width: 100%; height: 44px;">
+                  <i class="fas fa-key"></i> Update Password
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- SECTION 7: SETTINGS -->
+      <div id="section-settings" class="dashboard-view-section">
+        <div class="profile-card">
+          <h2 class="section-title"><i class="fas fa-sliders-h"></i> Commute & Notification Preferences</h2>
+          <p class="section-desc">Customize how you receive alerts and commute in Kolhapur.</p>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="pref-whatsapp" checked style="width: 18px; height: 18px; accent-color: var(--primary);">
+              <div>
+                <strong>SMS & WhatsApp Updates</strong>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Get instant ride confirmation and pickup reminders.</p>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="pref-gender" style="width: 18px; height: 18px; accent-color: var(--primary);">
+              <div>
+                <strong>Women-Only Rides Preference</strong>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Show and match only female riders and drivers when commuting.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Ride Details Modal -->
+  <div class="modal-overlay" id="rideDetailsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-ride-title">Ride Details</h3>
+        <button class="modal-close-btn" id="closeDetailsModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-ride-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline btn-sm" id="closeDetailsModalActionBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Location Modal -->
+  <div class="modal-overlay" id="addLocationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Save a Location</h3>
+        <button class="modal-close-btn" id="closeLocationModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="save-location-form" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">Location Label</label>
+            <input type="text" id="loc-label" class="form-input" placeholder="e.g. Home, College, Office" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kolhapur Station / Area</label>
+            <select id="loc-station-select" class="form-select" required>
+              <option value="KIT College of Engineering">KIT College of Engineering</option>
+              <option value="DY Patil College">DY Patil College</option>
+              <option value="Shivaji University">Shivaji University</option>
+              <option value="Rajaram College">Rajaram College</option>
+              <option value="Vivekanand College">Vivekanand College</option>
+              <option value="CBS (Central Bus Stand)">CBS (Central Bus Stand)</option>
+              <option value="Kolhapur Railway Station">Kolhapur Railway Station</option>
+              <option value="Rankala Lake">Rankala Lake</option>
+              <option value="Rajarampuri">Rajarampuri</option>
+              <option value="Tarabai Park">Tarabai Park</option>
+              <option value="RK Nagar">RK Nagar</option>
+              <option value="Shahupuri">Shahupuri</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Save Location</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/app.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
