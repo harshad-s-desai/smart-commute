@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCommute - Share Rides. Reduce Congestion.</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6.4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Project Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        :root {
+            --brand-green: #275338;
+            --brand-green-hover: #1e402b;
+            --brand-sage-pill: #e8f3ea;
+            --brand-sage-bg: #f5f8f5;
+            --brand-heading: #1c3627;
+            --brand-text: #4b5563;
+            --brand-border: #e5ebe6;
+            --brand-footer: #183624;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--brand-sage-bg);
+            color: var(--brand-text);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Navbar Layout matching Screenshot 2 & 3 */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--brand-border);
+            height: 72px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            text-decoration: none;
+            color: var(--brand-heading);
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #eaf2ec;
+            color: var(--brand-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.25rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.15s ease;
+            position: relative;
+            padding-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--brand-green);
+        }
+
+        .nav-link.active {
+            color: var(--brand-green);
+            font-weight: 600;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2.5px;
+            background-color: var(--brand-green);
+            border-radius: 2px;
+        }
+
+        .nav-auth {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        /* Pill Buttons */
+        .btn-pill-solid {
+            background-color: var(--brand-green);
+            color: #ffffff !important;
+            font-weight: 600;
+            font-size: 0.925rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(39, 83, 56, 0.2);
+        }
+
+        .btn-pill-solid:hover {
+            background-color: var(--brand-green-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(39, 83, 56, 0.28);
+            color: #ffffff !important;
+        }
+
+        .btn-pill-outline {
+            background-color: #ffffff;
+            color: #374151 !important;
+            font-weight: 600;
+            font-size: 0.925rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-pill-outline:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+            color: var(--brand-heading) !important;
+            transform: translateY(-1px);
+        }
+
+        /* HERO SECTION (Screenshot 2) */
+        .hero-section {
+            padding: 5rem 0 3.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background Subtle Radial Glow */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 15%;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 243, 234, 0.8) 0%, rgba(245, 248, 245, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 8%;
+            right: 15%;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 243, 234, 0.8) 0%, rgba(245, 248, 245, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Explicitly vertically centered box to prevent any layout splitting */
+        .landing-hero-box {
+            position: relative;
+            z-index: 2;
+            max-width: 820px;
+            margin: 0 auto;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+        }
+
+        .hero-tag-pill {
+            display: inline-block;
+            background-color: var(--brand-sage-pill);
+            color: var(--brand-green);
+            padding: 0.4rem 1.15rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-headline {
+            font-size: 3.25rem;
+            font-weight: 800;
+            color: var(--brand-heading);
+            letter-spacing: -0.03em;
+            line-height: 1.18;
+            margin-bottom: 1.25rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 2.25rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        .hero-cta-group {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 1rem !important;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        /* MAKE EVERY COMMUTE COUNT SECTION (Screenshot 2 bottom) */
+        .showcase-section {
+            padding: 2.5rem 0 4.5rem 0;
+            text-align: center;
+        }
+
+        .showcase-header {
+            margin-bottom: 2rem;
+        }
+
+        .showcase-title {
+            font-size: 2.15rem;
+            font-weight: 800;
+            color: var(--brand-heading);
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+        }
+
+        .showcase-subtitle {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .showcase-banner-card {
+            background: #ffffff;
+            border: 1px solid var(--brand-border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px -10px rgba(39, 83, 56, 0.08);
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .showcase-img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* EVERYTHING YOU NEED SECTION (Screenshot 3) */
+        .everything-section {
+            padding: 5rem 0 5.5rem 0;
+            background-color: #ffffff;
+            border-top: 1px solid var(--brand-border);
+            border-bottom: 1px solid var(--brand-border);
+        }
+
+        .everything-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .everything-title {
+            font-size: 2.35rem;
+            font-weight: 800;
+            color: var(--brand-heading);
+            letter-spacing: -0.025em;
+            margin-bottom: 0.65rem;
+        }
+
+        .everything-subtitle {
+            font-size: 1.05rem;
+            color: #6b7280;
+        }
+
+        .everything-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #f7faf7;
+            border: 1px solid var(--brand-border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            background: #ffffff;
+            box-shadow: 0 15px 30px -8px rgba(39, 83, 56, 0.12);
+            border-color: #cde0d1;
+        }
+
+        .feature-icon-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .icon-green {
+            background: #e6f3e8;
+            color: #275338;
+        }
+
+        .icon-peach {
+            background: #fef0eb;
+            color: #d9532f;
+        }
+
+        .icon-mint {
+            background: #e6f7f5;
+            color: #0f766e;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--brand-heading);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        /* LIVE ROUTE SEARCH CARD */
+        .search-widget-section {
+            padding: 4.5rem 0;
+            background: var(--brand-sage-bg);
+        }
+
+        .search-card-box {
+            background: #ffffff;
+            border: 1px solid var(--brand-border);
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--brand-heading);
+        }
+
+        .search-card-header p {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .search-grid-form {
+            display: grid;
+            grid-template-columns: 1.4fr 1.4fr 1fr 1fr;
+            gap: 1.25rem;
+            align-items: flex-end;
+        }
+
+        .search-field label {
+            display: block;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .search-select,
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--brand-border);
+            font-family: inherit;
+            font-size: 0.925rem;
+            color: #1f2937;
+            background: #f9fafb;
+        }
+
+        .search-select:focus,
+        .search-input:focus {
+            outline: none;
+            border-color: var(--brand-green);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(39, 83, 56, 0.12);
+        }
+
+        /* REAL TRANSIT HUBS SECTION */
+        .hubs-section {
+            padding: 4.5rem 0;
+            background: #ffffff;
+        }
+
+        .hubs-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .hubs-header h3 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--brand-heading);
+            margin-bottom: 0.5rem;
+        }
+
+        .hubs-header p {
+            font-size: 0.95rem;
+            color: #6b7280;
+        }
+
+        .hubs-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hub-tag {
+            padding: 0.6rem 1.15rem;
+            border-radius: 9999px;
+            background: #f4f8f5;
+            border: 1px solid var(--brand-border);
+            color: var(--brand-heading);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .hub-tag i {
+            color: var(--brand-green);
+            font-size: 0.8rem;
+        }
+
+        .hub-tag:hover {
+            background: #eaf2ec;
+            border-color: var(--brand-green);
+            transform: translateY(-2px);
+        }
+
+        /* CLEAN MINIMAL FOOTER (Screenshot 3 bottom) */
+        .footer {
+            background-color: var(--brand-footer);
+            color: #cbd5e1;
+            padding: 4.5rem 0 2.5rem 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .footer-brand h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #94a3b8;
+            max-width: 320px;
+        }
+
+        .footer-col h5 {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .everything-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-grid-form {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .hero-headline {
+                font-size: 2.4rem;
+            }
+            .hero-cta-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-pill-solid, .btn-pill-outline {
+                justify-content: center;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar matching Screenshot 2 & 3 -->
+    <header>
+        <nav class="navbar" id="mainNavbar">
+            <div class="nav-container">
+                <a href="/" class="nav-logo">
+                    <div class="nav-logo-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <span>SmartCommute</span>
+                </a>
+
+                <div class="nav-links" id="navLinks">
+                    <a href="/" class="nav-link active">Home</a>
+                    <a href="/find-ride.html" class="nav-link">Find Ride</a>
+                    <a href="/offer-ride.html" class="nav-link">Offer Ride</a>
+                    <a href="/find-ride.html#transit" class="nav-link">Transit Options</a>
+                    <a href="#stations" class="nav-link">Stations</a>
+                </div>
+
+                <div class="nav-auth" id="navAuth">
+                    <a href="/login.html" class="btn-pill-solid" id="navAccountBtn">
+                        <i class="fas fa-user"></i>
+                        <span>Account</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section matching Screenshot 2 -->
+        <section class="hero-section">
+            <div class="landing-hero-box">
+                <div class="hero-tag-pill">SMART TRANSIT & CARPOOLING</div>
+                <h1 class="hero-headline">Share Rides. Reduce Congestion.</h1>
+                <p class="hero-subtitle">
+                    Connect with verified peer rides across Kolhapur, cut daily travel costs, and discover real-time KMT bus & transit schedules.
+                </p>
+
+                <div class="hero-cta-group">
+                    <a href="/find-ride.html" class="btn-pill-solid">
+                        <i class="fas fa-plus"></i>
+                        <span>Find a Ride</span>
+                    </a>
+                    <a href="/offer-ride.html" class="btn-pill-outline">
+                        <span>Offer a Ride</span>
+                    </a>
+                    <a href="/find-ride.html?transit=true" class="btn-pill-outline">
+                        <i class="fas fa-bus-simple" style="color: var(--brand-green);"></i>
+                        <span>Transit Comparison</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Make Every Commute Count Section (Screenshot 2 bottom) -->
+        <section class="showcase-section">
+            <div class="container">
+                <div class="showcase-header">
+                    <h2 class="showcase-title">Make Every Commute Count</h2>
+                    <p class="showcase-subtitle">Smart multimodal routes, verified peer rides, and zero surge pricing.</p>
+                </div>
+
+                <div class="showcase-banner-card">
+                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80" alt="Kolhapur Daily Commuters" class="showcase-img" onerror="this.style.display='none'; document.getElementById('fallbackVector').style.display='block';">
+                    <div id="fallbackVector" style="display: none; width: 100%; height: 360px; background: linear-gradient(135deg, #eaf2ec 0%, #cad8ce 100%);"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EVERYTHING YOU NEED SECTION (Screenshot 3) -->
+        <section class="everything-section" id="features">
+            <div class="container">
+                <div class="everything-header">
+                    <h2 class="everything-title">Everything You Need</h2>
+                    <p class="everything-subtitle">Simple tools to help you manage your daily commute.</p>
+                </div>
+
+                <div class="everything-grid">
+                    <!-- Card 1: En-Route Ride Matching (Soft Green Icon) -->
+                    <div class="feature-card">
+                        <div class="feature-icon-badge icon-green">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h3>En-Route Ride Matching</h3>
+                        <p>
+                            Intelligent vector corridor matching connects you with drivers passing through your pickup location with minimal detour and automatic pickup ETA.
+                        </p>
+                    </div>
+
+                    <!-- Card 2: Multimodal Transit (Soft Peach Icon) -->
+                    <div class="feature-card">
+                        <div class="feature-icon-badge icon-peach">
+                            <i class="fas fa-bus-simple"></i>
+                        </div>
+                        <h3>Multimodal Transit</h3>
+                        <p>
+                            Compare peer rides directly against KMT city bus timetables, shared auto stands, and local taxi fares for transparent pricing and travel duration.
+                        </p>
+                    </div>
+
+                    <!-- Card 3: Verified & Safe (Soft Mint Icon) -->
+                    <div class="feature-card">
+                        <div class="feature-icon-badge icon-mint">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <h3>Verified & Safe</h3>
+                        <p>
+                            Travel securely with verified student and employee profiles, transparent ratings, and female-only carpool filters for complete peace of mind.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Quick Commute Route Search (Connected to Real Database) -->
+        <section class="search-widget-section">
+            <div class="container">
+                <div class="search-card-box">
+                    <div class="search-card-header">
+                        <div>
+                            <h3>Where are you commuting today?</h3>
+                            <p>Find peer rides traveling along your route across Kolhapur</p>
+                        </div>
+                        <a href="/find-ride.html" class="btn-pill-outline" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                            <span>Advanced Filter</span>
+                            <i class="fas fa-sliders"></i>
+                        </a>
+                    </div>
+
+                    <form id="heroQuickSearchForm" action="/find-ride.html" method="GET">
+                        <div class="search-grid-form">
+                            <div class="search-field">
+                                <label for="quickOrigin"><i class="fas fa-circle-dot" style="color: var(--brand-green); margin-right: 4px;"></i> Leaving From</label>
+                                <select id="quickOrigin" name="origin" class="search-select">
+                                    <option value="">Select pickup station...</option>
+                                    <option value="KIT College of Engineering">KIT College of Engineering</option>
+                                    <option value="DY Patil College">DY Patil College</option>
+                                    <option value="Shivaji University">Shivaji University</option>
+                                    <option value="CBS (Central Bus Stand)">CBS (Central Bus Stand)</option>
+                                    <option value="Kolhapur Railway Station">Kolhapur Railway Station</option>
+                                    <option value="Rajarampuri">Rajarampuri</option>
+                                    <option value="Rankala Lake">Rankala Lake</option>
+                                    <option value="Tarabai Park">Tarabai Park</option>
+                                    <option value="RK Nagar">RK Nagar</option>
+                                </select>
+                            </div>
+
+                            <div class="search-field">
+                                <label for="quickDest"><i class="fas fa-location-dot" style="color: #d9532f; margin-right: 4px;"></i> Going To</label>
+                                <select id="quickDest" name="destination" class="search-select">
+                                    <option value="">Select dropoff station...</option>
+                                    <option value="Shivaji University">Shivaji University</option>
+                                    <option value="KIT College of Engineering">KIT College of Engineering</option>
+                                    <option value="DY Patil College">DY Patil College</option>
+                                    <option value="CBS (Central Bus Stand)">CBS (Central Bus Stand)</option>
+                                    <option value="Shiroli MIDC">Shiroli MIDC</option>
+                                    <option value="Mahalaxmi Temple">Mahalaxmi Temple</option>
+                                    <option value="Rankala Lake">Rankala Lake</option>
+                                </select>
+                            </div>
+
+                            <div class="search-field">
+                                <label for="quickDate"><i class="fas fa-calendar" style="color: var(--brand-green); margin-right: 4px;"></i> Travel Date</label>
+                                <input type="date" id="quickDate" name="date" class="search-input">
+                            </div>
+
+                            <button type="submit" class="btn-pill-solid" style="height: 46px; border-radius: 10px; justify-content: center;">
+                                <i class="fas fa-magnifying-glass"></i>
+                                <span>Find Rides</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real Stations Network Hubs (From PostgreSQL DB) -->
+        <section class="hubs-section" id="stations">
+            <div class="container">
+                <div class="hubs-header">
+                    <h3>Connected Kolhapur Transit Stations</h3>
+                    <p>Direct routes and verified pickup points across key education and commercial hubs</p>
+                </div>
+
+                <div class="hubs-pills" id="hubsPillsContainer">
+                    <a href="/find-ride.html?origin=KIT+College+of+Engineering" class="hub-tag">
+                        <i class="fas fa-graduation-cap"></i> KIT College
+                    </a>
+                    <a href="/find-ride.html?origin=DY+Patil+College" class="hub-tag">
+                        <i class="fas fa-graduation-cap"></i> DY Patil Campus
+                    </a>
+                    <a href="/find-ride.html?origin=Shivaji+University" class="hub-tag">
+                        <i class="fas fa-building-columns"></i> Shivaji University
+                    </a>
+                    <a href="/find-ride.html?origin=CBS+(Central+Bus+Stand)" class="hub-tag">
+                        <i class="fas fa-bus"></i> Central Bus Stand (CBS)
+                    </a>
+                    <a href="/find-ride.html?origin=Kolhapur+Railway+Station" class="hub-tag">
+                        <i class="fas fa-train"></i> Kolhapur Railway Station
+                    </a>
+                    <a href="/find-ride.html?origin=Rajarampuri" class="hub-tag">
+                        <i class="fas fa-map-pin"></i> Rajarampuri
+                    </a>
+                    <a href="/find-ride.html?origin=Rankala+Lake" class="hub-tag">
+                        <i class="fas fa-water"></i> Rankala Lake
+                    </a>
+                    <a href="/find-ride.html?origin=Tarabai+Park" class="hub-tag">
+                        <i class="fas fa-tree"></i> Tarabai Park
+                    </a>
+                    <a href="/find-ride.html?origin=Shiroli+MIDC" class="hub-tag">
+                        <i class="fas fa-industry"></i> Shiroli MIDC
+                    </a>
+                    <a href="/find-ride.html?origin=Mahalaxmi+Temple" class="hub-tag">
+                        <i class="fas fa-landmark"></i> Mahalaxmi Temple
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer matching Screenshot 3 bottom -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Col 1: Brand -->
+                <div class="footer-brand">
+                    <h4>
+                        <i class="fas fa-leaf" style="color: #68b28a;"></i>
+                        <span>SmartCommute</span>
+                    </h4>
+                    <p>
+                        Kolhapur's peer ridesharing and multimodal transit engine. Designed for college students, employees, and everyday commuters.
+                    </p>
+                </div>
+
+                <!-- Col 2: Navigation -->
+                <div class="footer-col">
+                    <h5>Commute</h5>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/find-ride.html">Find a Ride</a></li>
+                        <li><a href="/offer-ride.html">Offer a Ride</a></li>
+                        <li><a href="/find-ride.html#transit">Transit Comparison</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Hubs -->
+                <div class="footer-col">
+                    <h5>Key Hubs</h5>
+                    <ul class="footer-links">
+                        <li><a href="/find-ride.html?origin=KIT+College+of+Engineering">KIT College</a></li>
+                        <li><a href="/find-ride.html?origin=Shivaji+University">Shivaji University</a></li>
+                        <li><a href="/find-ride.html?origin=DY+Patil+College">DY Patil Campus</a></li>
+                        <li><a href="/find-ride.html?origin=CBS+(Central+Bus+Stand)">Central Bus Stand</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Account & Admin -->
+                <div class="footer-col">
+                    <h5>Account</h5>
+                    <ul class="footer-links">
+                        <li><a href="/login.html">Sign In</a></li>
+                        <li><a href="/login.html#signup">Create Account</a></li>
+                        <li><a href="/dashboard.html">My Dashboard</a></li>
+                        <li><a href="/admin.html" style="color: #68b28a; font-weight: 600;"><i class="fas fa-shield-halved" style="margin-right: 4px;"></i> Admin Portal</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>&copy; 2026 SmartCommute Kolhapur. All rights reserved.</div>
+                <div>Peer-to-Peer Transit & Corridor Ride Engine</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global Scripts -->
+    <script src="/js/app.js"></script>
+    <script src="/js/auth.js"></script>
+
+    <!-- Quick Date Sync & Dynamic Stations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default date for quick search to today
+            const dateInput = document.getElementById('quickDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+                dateInput.min = today;
+            }
+
+            // Populate stations dynamically from /api/stations if available
+            fetch('/api/stations')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.stations && data.stations.length > 0) {
+                        const originSelect = document.getElementById('quickOrigin');
+                        const destSelect = document.getElementById('quickDest');
+                        if (originSelect && destSelect) {
+                            originSelect.innerHTML = '<option value="">Select pickup station...</option>';
+                            destSelect.innerHTML = '<option value="">Select dropoff station...</option>';
+                            data.stations.forEach(s => {
+                                const opt1 = document.createElement('option');
+                                opt1.value = s.name;
+                                opt1.textContent = s.name;
+                                originSelect.appendChild(opt1);
+
+                                const opt2 = document.createElement('option');
+                                opt2.value = s.name;
+                                opt2.textContent = s.name;
+                                destSelect.appendChild(opt2);
+                            });
+                        }
+                    }
+                })
+                .catch(() => {});
+        });
+    </script>
+</body>
+</html>

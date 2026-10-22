@@ -1,0 +1,6 @@
+{
+  "liveServer.settings.root": "/public",
+  "files.associations": {
+    "*.sql": "sql"
+  }
+}
